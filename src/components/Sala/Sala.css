@@ -7,15 +7,14 @@
     height: auto;
     width: auto;
     margin: 30px;
-    max-height: 200px;
+    max-height: 250px;
 }
 
 .sala header{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 25px;
-    height: 100%;
+    padding: 1.5rem;
     border-radius: 10px 10px 0 0 ;
     transition: all 0.2s ease;
     cursor: pointer;
@@ -47,6 +46,9 @@
     width: 0;
     overflow: hidden;
     transition: max-height 0.5s ease;
+}
+.sala aside span{
+    font-weight: bolder;
 }
 
 .sala aside section{

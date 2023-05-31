@@ -1,0 +1,25 @@
+section.filters select{
+    border: 1px solid gray;
+    font-weight: 700;
+    border-radius: 10px;
+    background: none;
+    font-size: 1.2rem;
+    padding: 1rem;
+}
+
+section.filters .blocos button{
+    width: 3.5rem;
+    height: 3.5rem;
+    color: #2376D7;
+    font-weight: 600;
+    border: 1px solid #2376D7;
+    background: none;
+    border-radius: 10px;
+    cursor: pointer;
+} 
+
+section.filters .blocos button.ativo{
+    background: #2376D7;
+    border: none;
+    color: white;
+}

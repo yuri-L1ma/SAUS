@@ -1,11 +1,23 @@
-import './App.css';
-import Home from './pages/Home';
+import './styles/App.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import Menu from "./components/Menu/Menu"
+import Home from './pages/Home/Home';
+import Reservas from './pages/Reservas/Reservas';
 // import Login from './pages/Login';
 
 function App() {
   return (
-    // <Login></Login>
-    <Home></Home>
+    <BrowserRouter>
+      <Menu />
+      <main className='p-4'>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="aluno/reservas" element={<Reservas />} />
+        </Routes>
+        
+      </main>
+    </BrowserRouter>
   );
 }
 

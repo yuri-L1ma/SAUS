@@ -1,0 +1,14 @@
+
+
+input.textfield{
+  border: 1px solid #ddd;
+  height: 2.5rem;
+  border-radius: 5px;
+  background: none;
+  padding: 1.5rem;
+  font-size: 1rem;
+}
+
+#root{
+  height: 100%;
+}

@@ -1,5 +1,5 @@
-import css from "./ModalQueixa.css"
-import seta from "../assets/icons/setaBack.svg"
+import "./ModalQueixa.css"
+import seta from "../../assets/icons/setaBack.svg"
 
 const ModalQueixa = ({ isOpen, onClose }) => {
 
@@ -7,7 +7,7 @@ const ModalQueixa = ({ isOpen, onClose }) => {
         return null
 
     return (
-        <div className="modal">
+        <div className="modalyuri">
             <div className="modal_content">
                 <div className="modal_header">
                     <div>

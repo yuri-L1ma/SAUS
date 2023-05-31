@@ -1,0 +1,52 @@
+.menu{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 2rem;
+    background: #2376D7;
+    z-index: 2;
+}
+
+.menu button{
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    border-radius: 10px;
+    width: 5rem;
+    height: 5rem;
+    color: white;
+    transition: background-color .2s ease-in-out;
+}
+
+.menu button:hover{
+    background: #1b589e;
+}
+
+.menu-colapse{
+    position: relative;
+    top: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow:hidden;
+    background: gray;
+}
+
+.menu-colapse ul{
+    position: absolute;
+    width: 60%;
+    height: 100vh;
+    background: red;
+}
+
+.img_container{
+    width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+img{
+    width: 100%;
+    /* object-fit: contain; */
+}

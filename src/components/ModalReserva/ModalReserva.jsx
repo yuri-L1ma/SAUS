@@ -1,13 +1,15 @@
-import css from "./ModalReserva.css"
-import seta from "../assets/icons/setaBack.svg"
+import "./ModalReserva.css"
+import seta from "../../assets/icons/setaBack.svg"
 
 const ModalReserva = ({isOpen, onClose }) => {
 
     if (!isOpen)
-        return null
+        return (
+            null
+        )
 
     return (
-        <div className="modal">
+        <div className="modalyuri">
             <div className="modal_content">
                 <div className="modal_header">
                     <div>
