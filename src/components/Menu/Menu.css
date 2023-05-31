@@ -2,9 +2,14 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding: 2rem;
+    padding: 1.5rem;
     background: #2376D7;
-    z-index: 2;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    height: 15vh;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    width: 100%;
 }
 
 .menu button{
@@ -23,20 +28,49 @@
 }
 
 .menu-colapse{
-    position: relative;
-    top: 0;
-    right: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow:hidden;
-    background: gray;
+    position: relative; 
 }
 
 .menu-colapse ul{
+    margin: 0;
+    padding: 0;
+    background: #2376D7;
+    color: white;
+    height: 85vh;
     position: absolute;
-    width: 60%;
-    height: 100vh;
-    background: red;
+    top: 0;
+    right: 0;
+}
+
+.menu-colapse .container{
+    width: 0;
+    height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    min-width: 200px;
+    transition: width .2s ease-in-out;
+}
+
+.menu-colapse.ativo .container{
+    width: 75%;
+    padding: 2rem;
+    overflow: visible;
+}
+
+
+.menu-colapse h5{
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: normal;
+}
+
+.menu .item{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rebeccapurple;
 }
 
 .img_container{
