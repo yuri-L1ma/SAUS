@@ -59,7 +59,9 @@ const Menu = () => {
                                     <span className="icon">
                                         <img src={queixas_icon} alt="" />
                                     </span>
-                                    <h5>Minhas queixas</h5>
+                                    <NavLink onClick={closeMenu} to={"/aluno/queixas"} className={"text-light text-decoration-none"}>
+                                        <h5>Minhas queixas</h5>
+                                    </NavLink>
                                 </div>
                             </div>
                         </div>

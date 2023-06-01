@@ -1,0 +1,42 @@
+.queixas {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.queixas .buttonQueixa{
+    border: 1px solid #2376D7;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: none;
+    transition: all 0.2s ease;
+}
+
+.queixas .buttonQueixa h4{
+    font-weight: bolder;
+    color: #2376D7;
+    font-size: 1.2rem;
+}
+
+.queixas .buttonQueixa span{
+    transform: rotateZ(-90deg);
+    transition: transform 0.2s ease;
+}
+
+.queixas .buttonQueixa.focused{
+    background: #2376D7;
+}
+
+.queixas .buttonQueixa.focused h4{
+    color: #fff;
+}
+
+.queixas .buttonQueixa.focused span{
+    filter: brightness(0) invert(1);
+    transform: rotateZ(90deg);
+}

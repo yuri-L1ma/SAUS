@@ -1,0 +1,131 @@
+.reserva{
+    border: 1px solid #2376D7;
+    border-radius: 10px;
+}
+
+.reserva.ativo aside{
+    height: auto;
+    width: auto;
+    margin: 30px;
+    max-height: 1200px;
+}
+
+.reserva header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-radius: 10px 10px 0 0 ;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.reserva header h1:first-child{
+    font-size: 1.4rem;
+    color: #2376D7;
+    font-weight: 400;
+}
+
+.reserva header h1.ativa{
+    color: #6FB98F;
+    font-size: 1.1rem;
+    text-transform: capitalize;
+}
+.reserva header h1.inativa{
+    color: #E55454;
+    font-size: 1.1rem;
+    text-transform: capitalize;
+}
+
+.reserva aside{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-height: 0;
+    width: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+.reserva aside span{
+    font-weight: bolder;
+}
+
+.reserva aside section{
+    display: flex;
+    justify-content: space-between;
+    color: #2376D7;
+}
+
+.reserva.ativo header{
+    background: #2376D7;
+}
+.reserva.ativo header > h1{
+    color: white;
+}
+
+section form{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 30px;
+}
+
+section form .input_group{
+    width: 100%;
+    display: flex;
+    gap: 15px;
+    flex-direction: column;
+}
+
+section form .input_radio{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+section form input[type="checkbox"]{
+    width: 25px;
+    border-radius: 20px;
+    border-color: #2376D7;
+}
+
+section form select{
+    border: 1px solid #ddd;
+    height: 3.12rem;
+    border-radius: 5px;
+    background: none;
+    padding: 0.8rem;
+    font-size: 1rem;
+}
+
+section form textarea{
+    /* appearance: none; */
+    background: none;
+    border: 1px solid gray;
+    font-weight: 400;
+    border-radius: 10px;
+    font-size: 1rem;
+    padding: 1rem;
+}
+
+section form label {
+    color: #305C90;
+}
+
+section form button{
+    /* padding: 1rem; */
+    width: 3rem;
+    height: 3rem;
+    align-self: flex-end;
+    border: none;
+    /* background:#6FB98F; */
+    color: white;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+section .info-destaque{
+    font-weight: bolder;
+    color: #1B2845;
+}
