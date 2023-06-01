@@ -14,7 +14,7 @@ const ModalFeedback = ({ isOpen, onClose }) => {
                         <button className="close" onClick={onClose}>
                             <span><img src={seta} alt="" /></span>
                         </button>
-                        <h1>Fazer Queixa</h1>
+                        <h1>Dar feedback</h1>
                     </div>
                     <h3>Sala 1, Bloco 1</h3>
                 </div>
