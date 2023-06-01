@@ -75,6 +75,10 @@
     color: white;
 }
 
+.sala aside button:first-child{
+    background: #2376D7;
+}
+
 .sala.ativo header{
     background: #2376D7;
 }

@@ -2,9 +2,11 @@ import "./Sala.css"
 import { useState } from "react";
 import ModalReserva from "../ModalReserva/ModalReserva"
 import ModalQueixa from "../ModalQueixa/ModalQueixa";
+import ModalFeedback from "../ModalFeedback/ModalFeedback";
 
 const Sala = ({ nome, bloco, disponivel, equipamentos }) => {
     const [modalOpen, setModalOpen] = useState(false);
+    const [modalFeedbackOpen, setModalFeedbackOpen] = useState(false);
 
     const toggleActiveClassroom = (sala) => {
         sala.parentElement.classList.toggle("ativo")
@@ -16,6 +18,14 @@ const Sala = ({ nome, bloco, disponivel, equipamentos }) => {
 
     const closeModal = () => {
         setModalOpen(false);
+    };
+
+    const openModalFeedback = () => {
+        setModalFeedbackOpen(true);
+    };
+
+    const closeModalFeeedback = () => {
+        setModalFeedbackOpen(false);
     };
 
     const qualModal = () => {
@@ -50,9 +60,13 @@ const Sala = ({ nome, bloco, disponivel, equipamentos }) => {
                             <p>45 pessoas</p>
                         </div>
                     </section>
-                    {disponivel ? <button onClick={openModal}>Fazer Reserva</button> : <button style={{ backgroundColor: "#E55454" }} onClick={openModal}>Fazer Queixa</button>}
+                    <div className="d-flex w-100 gap-2 justify-content-end">
+                        <button onClick={openModalFeedback}>Dar feedback</button>
+                        {disponivel ? <button onClick={openModal}>Fazer Reserva</button> : <button style={{ backgroundColor: "#E55454" }} onClick={openModal}>Fazer Queixa</button>}
+                    </div>
                 </aside>
             </div>
+            <ModalFeedback isOpen={modalFeedbackOpen} onClose={closeModalFeeedback} />
             {qualModal()}
         </>
     )
