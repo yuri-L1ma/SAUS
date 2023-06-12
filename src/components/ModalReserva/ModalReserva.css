@@ -1,4 +1,4 @@
-.modalyuri {
+/* .modalyuri {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -12,22 +12,17 @@
     background-color: rgba(0, 0, 0, 0.8);
 }
 
-/* Modal Content/Box */
 .modal_content {
     background-color: #fefefe;
-    /* 15% from the top and centered */
     margin: 0 30px;
     width: 100%;
     max-height: 70%;
-    /* margin: auto 0; */
     border-radius: 10px;
     overflow: auto;
-    /* Could be more or less, depending on screen size */
 }
 
 .modalyuri .modal_header {
     position: fixed;
-    width: calc(100% - 60px);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -37,30 +32,10 @@
     border-radius: 10px 10px 0 0;
 }
 
-.modalyuri .modal_header div{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transform: translateX(-24px);
-}
-
 .modalyuri .modal_header h1{
     color: white;
     font-size: 1.1rem;
     font-weight: 400;
-}
-
-.modalyuri .modal_header button {
-    padding: 25px;
-    background: none;
-    /* background: #4fa1ff; */
-    border: none;
-    color: white;
-}
-
-.modalyuri .modal_header button img{
-    width: 100%;
-    object-fit: contain;
 }
 
 .modalyuri .modal_header h3{
@@ -101,7 +76,7 @@
 }
 
 .modalyuri section form select{
-    /* appearance: none; */
+    appearance: none;
     background: none;
     border: 1px solid gray;
     font-weight: 400;
@@ -111,7 +86,7 @@
 }
 
 .modalyuri section form textarea{
-    /* appearance: none; */
+    appearance: none;
     background: none;
     border: 1px solid gray;
     font-weight: 400;
@@ -130,8 +105,12 @@
     align-self: center;
     border: none;
     height: 3.5rem;
-    /* background:#6FB98F; */
+    background:#6FB98F;
     color: white;
     border-radius: 8px;
     font-size: 1rem;
 }
+
+@media screen and (min-width: 768px) {
+
+} */

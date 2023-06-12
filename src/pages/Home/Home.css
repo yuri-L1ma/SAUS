@@ -23,3 +23,21 @@ section.filters .blocos button.ativo{
     border: none;
     color: white;
 }
+
+div.icons{
+    display: none;
+}
+
+@media screen and (min-width: 768px){ 
+    section.filters{
+      flex-direction: row !important;
+      flex-direction: row-reverse !important;
+      justify-content: start;
+    }
+    
+    div.icons{
+        display: flex;
+        gap: 20px;
+    }
+  }
+

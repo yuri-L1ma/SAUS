@@ -3,14 +3,25 @@ import { useState } from "react";
 import ModalReserva from "../ModalReserva/ModalReserva"
 import ModalQueixa from "../ModalQueixa/ModalQueixa";
 import ModalFeedback from "../ModalFeedback/ModalFeedback";
+import projetor_icon from "../../assets/icons/projetor.svg"
+import ar_icon from "../../assets/icons/ar.svg"
+import { Edit2Icon } from "lucide-react";
+import { useContext } from "react"
+import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
 
 const Sala = ({ nome, bloco, disponivel, equipamentos }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalFeedbackOpen, setModalFeedbackOpen] = useState(false);
+    const {admin} = useContext(ContextoGambiarra)
+    
 
     const toggleActiveClassroom = (sala) => {
         sala.parentElement.classList.toggle("ativo")
     }
+
+    // const configureModals = () => {
+    //     if(user)
+    // }
 
     const openModal = () => {
         setModalOpen(true);
@@ -40,8 +51,31 @@ const Sala = ({ nome, bloco, disponivel, equipamentos }) => {
         <>
             <div className="sala">
                 <header onClick={(event) => toggleActiveClassroom(event.target)}>
-                    <h1>{nome}</h1>
-                    <h1 className={disponivel ? "disponivel" : "indisponivel"}>{disponivel ? "disponivel" : "indisponivel"}</h1>
+                    <div className="d-flex gap-3 align-items-center">
+                        <h1>{nome}</h1>
+                        {admin ?
+                            <button className="rounded-button" onClick={openModal}>
+                                <Edit2Icon size={16} />
+                            </button>
+                            : null}
+                    </div>
+                    <div className="icons">
+                        <span>
+                            <img src={projetor_icon} alt="" />
+                        </span>
+                        <span>
+                            <img src={ar_icon} alt="" />
+                        </span>
+                    </div>
+                    <h1 className={disponivel ? "disponivel" : "indisponivel"}>{disponivel ? "disponivel" : "reservado"}</h1>
+                    {disponivel ?
+                        <button className="green" onClick={openModal}>Fazer Reserva</button>
+                        :
+                        !admin ?
+                        <button className="red" onClick={openModal}>Fazer Queixa</button>
+                        :
+                        <button className="red" onClick={openModal}>Ver reserva</button>
+                    }
                 </header>
                 <aside>
                     <section>
@@ -61,8 +95,17 @@ const Sala = ({ nome, bloco, disponivel, equipamentos }) => {
                         </div>
                     </section>
                     <div className="d-flex w-100 gap-2 justify-content-end">
-                        <button onClick={openModalFeedback}>Dar feedback</button>
-                        {disponivel ? <button onClick={openModal}>Fazer Reserva</button> : <button style={{ backgroundColor: "#E55454" }} onClick={openModal}>Fazer Queixa</button>}
+                        {!admin ?
+                            <button className="outlined" onClick={openModalFeedback}>Dar feedback</button>
+                            : null
+                        }
+                        {disponivel ?
+                            <button className="green d-md-none" onClick={openModal}>Fazer Reserva</button>
+                            :
+                            !admin ?
+                            <button className="red d-md-none" onClick={openModal}>Fazer Queixa</button>
+                            : null
+                        }
                     </div>
                 </aside>
             </div>

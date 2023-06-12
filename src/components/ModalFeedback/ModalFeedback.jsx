@@ -1,4 +1,5 @@
-import "./ModalFeedback.css"
+// import "./ModalFeedback.css"
+import { ArrowLeft } from "lucide-react";
 import seta from "../../assets/icons/setaBack.svg"
 
 const ModalFeedback = ({ isOpen, onClose }) => {
@@ -7,18 +8,18 @@ const ModalFeedback = ({ isOpen, onClose }) => {
         return null
 
     return (
-        <div className="modalyuri">
+        <div className="modal_body">
             <div className="modal_content">
                 <div className="modal_header">
-                    <div>
+                    <div className="modal_title d-flex align-items-center">
                         <button className="close" onClick={onClose}>
-                            <span><img src={seta} alt="" /></span>
+                            <ArrowLeft size={24}/>
                         </button>
-                        <h1>Dar feedback</h1>
+                        <span>Dar feedback</span>
                     </div>
                     <h3>Sala 1, Bloco 1</h3>
                 </div>
-                <section>
+                <section className="modal_section">
                     <form action="">
                         <div className="input_group">
                             <label for="Remember">Material com defeito</label>

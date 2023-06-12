@@ -1,5 +1,6 @@
 import { useRef } from "react"
 import "./Reserva.css"
+import { XIcon } from "lucide-react"
 
 const Reserva = ({ ativa }) => {
     const reservaRef = useRef(null)
@@ -17,38 +18,50 @@ const Reserva = ({ ativa }) => {
             </header>
             <aside>
                 <section>
-                    <form action="">
-                        <div className="input_group">
-                            <label for="Remember">Nome completo</label>
-                            <input className="textfield" value={"YURI SILVA DE LIMA"} readOnly placeholder="Nome Completo" type="email" name="" id="" />
-                        </div>
-                        <div className="d-flex gap-2">
-                            <div className="input_group flex-grow-0">
-                                <label for="Remember">Matrícula</label>
-                                <input className="textfield" placeholder="" value={"512414"} readOnly type="number" name="" id="" />
-                            </div>
-                            <div className="input_group">
-                                <label for="Remember w-100">Período</label>
-                                <input className="textfield info-destaque" placeholder="" value={"AB - MANHÃ"} readOnly type="text" name="" id="" />
-                            </div>
-                        </div>
-                        <div className="d-flex gap-2">
-                            <div className="input_group">
-                                <div className="input_group flex-grow-1">
-                                    <label for="Remember">Atividade</label>
-                                    <input className="textfield info-destaque" placeholder="" value={"Estudar"} readOnly type="text" name="" id="" />
+                    <form action="" className="d-flex flex-column gap-3 w-100">
+                        <div className="d-flex flex-column gap-3 gap-md-5 flex-md-row">
+                            <div className="d-flex gap-md-3 flex-column w-100 justify-content-between">
+                                <div className="d-flex flex-column flex-md-row justify-content-between w-100 gap-3">
+                                    <div className="input_group">
+                                        <label for="Remember">Nome completo</label>
+                                        <input className="textfield" value={"YURI SILVA DE LIMA"} readOnly placeholder="Nome Completo" type="email" name="" id="" />
+                                    </div>
+                                    <div className="input_group align-items-md-end">
+                                        <label for="Remember">Matrícula</label>
+                                        <input className="textfield" placeholder="" value={"512414"} readOnly type="number" name="" id="" />
+                                    </div>
+                                </div>
+                                <div className="d-flex flex-column gap-3 flex-md-row w-100">
+                                    <div className="input_group">
+                                        <label for="Remember">Período</label>
+                                        <input className="textfield info-destaque" placeholder="" value={"AB - MANHÃ"} readOnly type="text" name="" id="" />
+                                    </div>
+                                    <div className="d-flex gap-3 flex-row justify-content-between">
+                                        <div className="input_group">
+                                            <label for="Remember">Atividade</label>
+                                            <select name="" id="">
+                                                <option value="">Hoje</option>
+                                                <option value="">Amanha</option>
+                                                <option value="">26/12</option>
+                                                <option value="">26/12</option>
+                                            </select>
+                                        </div>
+                                        <div className="input_group align-items-end">
+                                            <label for="Remember" className="text-nowrap">Nº de pessoas</label>
+                                            <input className="textfield" placeholder="Nº" type="number" name="" id="" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="input_group flex-grow-0">
-                                <label for="Remember">Nº de pessoas</label>
-                                <input className="textfield w-50" placeholder="" value={"5"} readOnly type="number" name="" id="" />
+                            <div className="input_group justificativa flex-shrink-1 w-auto">
+                                <label for="Remember">Justificativa</label>
+                                <textarea name="" readOnly value={"Estudar é bom e é porque é"} id="" cols="10" rows="5"></textarea>
                             </div>
                         </div>
-                        <div className="input_group">
-                            <label for="Remember">Justificativa</label>
-                            <textarea name="" readOnly value={"Estudar é bom e é porque é"} id="" cols="30" rows="10"></textarea>
-                        </div>
-                        <button  onClick={toggleActiveReserve} style={{ backgroundColor: "#2376D7" }}>X</button>
+                        <button onClick={toggleActiveReserve} className="d-flex gap-2 justify-content-around d-md-none">
+                            <XIcon size={24} />
+                            <span>Fechar</span>
+                        </button>
                     </form>
                 </section>
             </aside>

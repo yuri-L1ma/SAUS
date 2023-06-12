@@ -1,0 +1,34 @@
+.bloco{
+    border: 1px solid #2376D7;
+    border-radius: 10px;
+}
+
+.bloco header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-radius: 10px 10px 0 0 ;
+}
+
+.bloco header div h1{
+    font-size: 1rem;
+    color: #2376D7;
+    font-weight: 400;
+}
+
+.bloco header div h1:last-child{
+    font-weight: bolder;
+}
+
+.bloco button{
+    width: 100%;
+    max-width: 150px;
+    /* min-width: 200px !important; */
+}
+
+@media screen and (max-width: 768px) {
+    .bloco button{
+        width: 100px;
+    }
+}

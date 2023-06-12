@@ -1,43 +1,48 @@
-.sala{
+.sala {
     border: 1px solid #2376D7;
     border-radius: 10px;
 }
 
-.sala.ativo aside{
+.sala.ativo aside {
     height: auto;
     width: auto;
     margin: 30px;
     max-height: 250px;
 }
 
-.sala header{
+.sala header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem;
-    border-radius: 10px 10px 0 0 ;
+    border-radius: 10px 10px 0 0;
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
-.sala header h1:first-child{
+.sala header > button{
+    display: none;
+}
+
+.sala header h1:first-child {
     font-size: 1.4rem;
     color: #2376D7;
     font-weight: 400;
 }
 
-.sala header h1.disponivel{
+.sala header h1.disponivel {
     color: #6FB98F;
     font-size: 1.1rem;
     text-transform: capitalize;
 }
-.sala header h1.indisponivel{
+
+.sala header h1.indisponivel {
     color: #E55454;
     font-size: 1.1rem;
     text-transform: capitalize;
 }
 
-.sala aside{
+.sala aside {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -47,41 +52,41 @@
     overflow: hidden;
     transition: max-height 0.5s ease;
 }
-.sala aside span{
+
+.sala aside span {
     font-weight: bolder;
 }
 
-.sala aside section{
+.sala aside section {
     display: flex;
     justify-content: space-between;
     color: #2376D7;
 }
 
-.sala aside section ul{
+.sala aside section ul {
     list-style: none;
 }
 
-.sala aside section h3{
+.sala aside section h3 {
     line-height: 250%;
 }
 
-.sala aside button{
-    background: #6FB98F;
-    border: none;
-    padding: 15px;
-    width: 150px;
-    align-self: flex-end;
-    border-radius: 10px;
-    color: white;
-}
-
-.sala aside button:first-child{
+.sala.ativo header {
     background: #2376D7;
 }
 
-.sala.ativo header{
-    background: #2376D7;
-}
-.sala.ativo header > h1{
+.sala.ativo header> div h1, .sala.ativo header > h1, .sala.ativo header > div .rounded-button svg {
     color: white;
+    stroke: white;
+}
+
+@media screen and (min-width: 768px) {
+    .sala header{
+        padding: 1rem;
+    }
+
+    .sala header > button{
+        display: block;
+    }
+
 }

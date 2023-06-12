@@ -1,4 +1,5 @@
 import { useRef } from "react"
+import { XIcon } from "lucide-react";
 import "./Queixa.css"
 
 const Queixa = ({ motivo, data }) => {
@@ -22,7 +23,10 @@ const Queixa = ({ motivo, data }) => {
                             <label for="Remember">Descrição da Queixa</label>
                             <textarea name="" readOnly value={"Se danaram meninos teimosos eu escarro mesmo"} id="" cols="30" rows="3"></textarea>
                         </div>
-                        <button  onClick={toggleActiveReserve} style={{ backgroundColor: "#2376D7" }}>X</button>
+                        <button onClick={toggleActiveReserve} className="d-flex gap-2 justify-content-around">
+                            <XIcon size={24} />
+                            <span>Fechar</span>
+                        </button>
                     </form>
                 </section>
             </aside>

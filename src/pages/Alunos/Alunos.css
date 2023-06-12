@@ -1,0 +1,5 @@
+@media screen and (max-width: 768px) {
+    .search_input, .search_input input{
+        width: 100% !important;
+    }
+}

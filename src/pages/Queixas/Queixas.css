@@ -23,8 +23,8 @@
     font-size: 1.2rem;
 }
 
-.queixas .buttonQueixa span{
-    transform: rotateZ(-90deg);
+.queixas .buttonQueixa svg{
+    /* transform: rotateZ(-90deg); */
     transition: transform 0.2s ease;
 }
 
@@ -36,7 +36,7 @@
     color: #fff;
 }
 
-.queixas .buttonQueixa.focused span{
+.queixas .buttonQueixa.focused svg{
     filter: brightness(0) invert(1);
-    transform: rotateZ(90deg);
+    transform: rotateZ(180deg);
 }

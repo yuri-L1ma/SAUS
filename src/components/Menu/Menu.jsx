@@ -6,10 +6,16 @@ import reservas_icon from "../../assets/icons/calendar.svg"
 import queixas_icon from "../../assets/icons/queixa.svg"
 import config_icon from "../../assets/icons/config.svg"
 import sair_icon from "../../assets/icons/setaSair.svg"
+import bars_icon from "../../assets/icons/bars.svg"
 
-import { NavLink } from "react-router-dom"
+import { NavLink, Link } from "react-router-dom"
+import { Building2, Home, Megaphone, Ticket, Users2, UserCircle, ArrowLeftRight, LogOut } from "lucide-react"
+import { useContext } from "react"
+import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
 
 const Menu = () => {
+    const { admin, updateAdmin } = useContext(ContextoGambiarra)
+
     const toogleMenu = () => {
         const menu = document.querySelector(".menu-colapse")
         menu.classList.toggle("ativo")
@@ -17,18 +23,106 @@ const Menu = () => {
 
     const closeMenu = () => {
         const menu = document.querySelector(".menu-colapse")
-        menu.classList.remove("ativo") 
+        menu.classList.remove("ativo")
+    }
+
+    const tooglePoder = () => {
+        updateAdmin()
     }
 
     return (
         <>
             <nav className="menu">
-                <div className="img_container">
-                    <NavLink to={"/"} >
-                        <img onClick={closeMenu} src={logo} alt="" />
-                    </NavLink>
+                <div className="box">
+                    <div className="img_container">
+                        <Link to={"/"}>
+                            <img onClick={closeMenu} src={logo} alt="" />
+                        </Link>
+                    </div>
+                    <div className="gambiarra">
+                        <button className="d-flex align-items-center gap-3 w-100 h-100 gambiarra" onClick={tooglePoder}>
+                            <span>{admin ? "Admin" : "Aluno"}</span>
+                            <ArrowLeftRight size={24} />
+                            <span>{!admin ? "Admin" : "Aluno"}</span>
+                        </button>
+                    </div>
+                    <button onClick={toogleMenu} type="button">
+                        <img src={bars_icon} alt="" />
+                    </button>
+                    <ul className="nav gap-4 flex-nowrap">
+                        <li className="nav-item">
+                            <NavLink to={"/"} className={"nav-link"}>
+                                <div className="d-flex gap-3">
+                                    <Home size={24} />
+                                    <span>Home</span>
+                                </div>
+                            </NavLink>
+                        </li>
+                        {admin ?
+                            <>
+                                <li className="nav-item">
+                                    <NavLink to={"/admin/alunos"} className={"nav-link"}>
+                                        <div className="d-flex gap-3">
+                                            <Users2 size={24} />
+                                            <span>Alunos</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="nav-item">
+                                    <NavLink to={"/admin/blocos"} className={"nav-link"}>
+                                        <div className="d-flex gap-3">
+                                            <Building2 size={24} />
+                                            <span>Blocos</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="nav-item">
+                                    <NavLink to={"/admin/perfil"} className={"nav-link"}>
+                                        <div className="d-flex gap-3">
+                                            <UserCircle size={24} />
+                                            <span>Perfil</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                            </>
+                            :
+                            <>
+                                <li className="nav-item">
+                                    <NavLink to={"/aluno/reservas"} className={"nav-link"}>
+                                        <div className="d-flex gap-3">
+                                            <Ticket size={24} />
+                                            <span>Reservas</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="nav-item w-100">
+                                    <NavLink to={"/aluno/queixas"} className={"nav-link"}>
+                                        <div className="d-flex gap-3">
+                                            <Megaphone size={24} />
+                                            <span>Queixas</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                                <li className="nav-item w-100">
+                                    <NavLink to={"/aluno/perfil"} className={"nav-link"}>
+                                        <div className="d-flex gap-3">
+                                            <UserCircle size={24} />
+                                            <span>Perfil</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                            </>
+                        }
+                        <li className="nav-item">
+                            <NavLink to={"/login"} className={"nav-link bg-danger text-light"}>
+                                <div className="d-flex gap-3">
+                                    <LogOut size={24} />
+                                    <span>Sair</span>
+                                </div>
+                            </NavLink>
+                        </li>
+                    </ul>
                 </div>
-                <button onClick={toogleMenu} type="button">☰</button>
             </nav>
             <nav className="menu-colapse">
                 <div className="dontbreak">
