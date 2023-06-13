@@ -1,8 +1,13 @@
 import Sala from "../../components/Sala/Sala";
 import Menu from "../../components/Menu/Menu";
 import "./Home.css";
+import { PlusCircle } from "lucide-react";
+import { useContext } from "react"
+import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
 
 const Home = () => {
+    const { admin } = useContext(ContextoGambiarra)
+
 
     const salas = [
         { nome: "SALA 1", bloco: "3", disponivel: true, equipamentos: ["projetor", "lousa", "cadeiras"] },
@@ -65,7 +70,13 @@ const Home = () => {
                 <section className="salas mt-4">
                     <div className="d-flex w-100 align-items-center justify-content-between mb-3 ms-1">
                         <h5>Salas</h5>
-                        {/* <button>Adicionar sala</button> */}
+                        {admin ?
+                            <button className="d-flex gap-3 outlined w-auto">
+                                <PlusCircle size={24} />
+                                <span>Adicionar sala</span>
+                            </button>
+                            : null
+                        }
                     </div>
                     <div className="d-flex flex-column gap-4">
                         {

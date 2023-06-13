@@ -1,6 +1,5 @@
 import "./Sala.css"
-import { useEffect, useState } from "react";
-import ModalReserva from "../ModalReserva/ModalReserva"
+import { useState } from "react";
 import ModalQueixa from "../ModalQueixa/ModalQueixa";
 import ModalFeedback from "../ModalFeedback/ModalFeedback";
 import projetor_icon from "../../assets/icons/projetor.svg"
@@ -60,7 +59,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                                 <input className="textfield" placeholder="Matrícula" type="text" name="registration" id="registration" />
                             </div>
                         </div>
-                        <div className="d-flex w-100 gap-3">
+                        <div className="d-flex flex-column flex-md-row w-100 gap-3">
                             <div className="input_group">
                                 <label for="period">Período</label>
                                 <select name="period" id="period">
@@ -82,7 +81,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                         <div className="d-flex justify-content-between w-100">
                             <div className="input_group">
                                 <label for="activity">Atividade</label>
-                                <select name="activity" id="activity">
+                                <select className="w-100" name="activity" id="activity">
                                     <option value="Estudar com amigos">Estudar com amigos</option>
                                     <option value="Descansar">Descansar depois de um dia chato</option>
                                     <option value="Sei lá mano">Sei lá mano</option>
@@ -114,7 +113,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                                 <input className="textfield" placeholder="Matrícula" type="text" name="registration" id="registration" />
                             </div>
                         </div>
-                        <div className="d-flex w-100 gap-3">
+                        <div className="d-flex flex-column flex-md-row w-100 gap-3">
                             <div className="input_group">
                                 <label for="period">Período</label>
                                 <select name="period" id="period">
@@ -132,7 +131,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                         <div className="d-flex justify-content-between w-100">
                             <div className="input_group">
                                 <label for="activity">Atividade</label>
-                                <select name="activity" id="activity">
+                                <select className="w-100" name="activity" id="activity">
                                     <option value="Estudar com amigos">Estudar com amigos</option>
                                     <option value="Descansar">Descansar depois de um dia chato</option>
                                     <option value="Sei lá mano">Sei lá mano</option>
@@ -141,7 +140,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                             </div>
                             <div className="input_group align-items-end">
                                 <label for="people">Nº de pessoas</label>
-                                <input className="textfield w-50" placeholder="Nº" type="number" name="people" id="people" />
+                                <input className="textfield w-75" placeholder="Nº" type="number" name="people" id="people" />
                             </div>
                         </div>
                         <div className="input_group">
@@ -197,14 +196,14 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                             </div>
                             <div className="input_group align-items-end">
                                 <label for="people">Nº de pessoas</label>
-                                <input className="textfield w-50" placeholder="Nº" type="number" name="people" id="people" value={2} readOnly/>
+                                <input className="textfield w-50" placeholder="Nº" type="number" name="people" id="people" value={2} readOnly />
                             </div>
                         </div>
                         <div className="input_group">
                             <label for="justification">Justificativa</label>
                             <textarea name="justification" id="justification" value={"Cansei vetes"} cols="30" rows="10" readOnly></textarea>
                         </div>
-                        <button className="green">Reservar</button>
+                        <button className="red w-auto">Desabilitar reserva</button>
                     </form>
                 )
             }
@@ -221,6 +220,47 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
             </ModalBody>
         )
     }
+
+    const configureModalFeedback = () => {
+        return (
+            <ModalBody isOpen={modalFeedback}>
+                <ModalHeader title="Adicionar Feedback" subtitle={`${nome}, BLOCO ${bloco}`} onClose={closeModalFeeedback} />
+                <ModalSection>
+                    <form action="">
+                        <div className="input_group">
+                            <label for="Remember">Material com defeito</label>
+                            <input className="textfield" placeholder="Diga o material que tá com defeito" type="email" name="" id="" />
+                        </div>
+                        <div className="input_group">
+                            <label for="Remember">Descrição do defeito</label>
+                            <textarea name="" placeholder="Descreva o problema citado" id="" cols="30" rows="10"></textarea>
+                        </div>
+                        <button>Adicionar</button>
+                    </form>
+                </ModalSection>
+            </ModalBody>
+        )
+    }
+
+    const configureModalQueixa = () => {
+        <ModalBody isOpen={modalQueixa}>
+            <ModalHeader title="Fazer Queixa" subtitle={`${nome}, BLOCO ${bloco}`} onClose={closeModalQueixa} />
+            <ModalSection>
+                <form action="">
+                    <div className="input_group">
+                        <label for="Remember">Material com defeito</label>
+                        <input className="textfield" placeholder="Diga o material que tá com defeito" type="email" name="" id="" />
+                    </div>
+                    <div className="input_group">
+                        <label for="Remember">Descrição do defeito</label>
+                        <textarea name="" placeholder="Descreva o problema citado" id="" cols="30" rows="10"></textarea>
+                    </div>
+                    <button>Adicionar</button>
+                </form>
+            </ModalSection>
+        </ModalBody>
+    }
+
 
     const qualModal = () => {
         if (disponivel) {
@@ -286,15 +326,15 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                         }
                         {disponivel ?
                             <button className="green d-md-none" onClick={openModalReserva}>Fazer Reserva</button>
-                            :
-                            !admin ?
+                            : admin ?
+                                <button className="red d-md-none" onClick={openModalReserva}>Ver reserva</button>
+                                :
                                 <button className="red d-md-none" onClick={openModalQueixa}>Fazer Queixa</button>
-                                : null
                         }
                     </div>
                 </aside>
             </div>
-            <ModalFeedback isOpen={modalFeedback} onClose={closeModalFeeedback} />
+            {configureModalFeedback()}
             {qualModal()}
         </>
     )
