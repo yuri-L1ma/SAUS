@@ -1,7 +1,29 @@
 import "./Modal.css"
-import seta from "../../assets/icons/setaBack.svg"
+import { ArrowLeft } from "lucide-react"
 
-const Modal = ({ isOpen, children }) => {
+const ModalHeader = ({ title, subtitle, onClose }) => {
+    return (
+        <div className="modal_header">
+            <div className="modal_title d-flex align-items-center">
+                <button className="close" onClick={onClose}>
+                    <ArrowLeft size={24} />
+                </button>
+                <span>{title}</span>
+            </div>
+            <h3>{subtitle}</h3>
+        </div>
+    )
+}
+
+const ModalSection = ({ children }) => {
+    return (
+        <section className="modal_section">
+            {children}
+        </section>
+    )
+}
+
+const ModalBody = ({ isOpen, children }) => {
 
     if (!isOpen)
         return null
@@ -15,4 +37,4 @@ const Modal = ({ isOpen, children }) => {
     );
 }
 
-export default Modal
+export {ModalBody, ModalHeader, ModalSection}
