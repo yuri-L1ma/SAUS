@@ -45,112 +45,178 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
         setModalFeedback(false);
     };
 
+    const configureFormsReserva = () => {
+        if (disponivel) {
+            if (admin) {
+                return (
+                    <form action="">
+                        <div className="d-flex flex-column flex-md-row w-100 gap-3">
+                            <div className="input_group">
+                                <label for="full_name">Nome completo</label>
+                                <input className="textfield" placeholder="Nome completo" type="text" name="full_name" id="full_name" />
+                            </div>
+                            <div className="input_group">
+                                <label for="registration">Matrícula</label>
+                                <input className="textfield" placeholder="Matrícula" type="text" name="registration" id="registration" />
+                            </div>
+                        </div>
+                        <div className="d-flex w-100 gap-3">
+                            <div className="input_group">
+                                <label for="period">Período</label>
+                                <select name="period" id="period">
+                                    <option value="AB1">AB | MANHÃ</option>
+                                    <option value="CD1">CD | MANHÃ</option>
+                                    <option value="AB2">AB | TARDE</option>
+                                    <option value="CD2">CD | TARDE</option>
+                                </select>
+                            </div>
+                            <div className="input_group">
+                                <label for="init_date">Data inicial</label>
+                                <input className="textfield" type="date" name="init_date" value={moment().format("YYYY-MM-DD")} readOnly id="init_date" />
+                            </div>
+                            <div className="input_group">
+                                <label for="end_date">Data final</label>
+                                <input className="textfield" type="date" name="end_date" id="end_date" />
+                            </div>
+                        </div>
+                        <div className="d-flex justify-content-between w-100">
+                            <div className="input_group">
+                                <label for="activity">Atividade</label>
+                                <select name="activity" id="activity">
+                                    <option value="Estudar com amigos">Estudar com amigos</option>
+                                    <option value="Descansar">Descansar depois de um dia chato</option>
+                                    <option value="Sei lá mano">Sei lá mano</option>
+                                    <option value="Fofocar">Fofocar</option>
+                                </select>
+                            </div>
+                            <div className="input_group align-items-end">
+                                <label for="people">Nº de pessoas</label>
+                                <input className="textfield w-50" placeholder="Nº" type="number" name="people" id="people" />
+                            </div>
+                        </div>
+                        <div className="input_group">
+                            <label for="justification">Justificativa</label>
+                            <textarea name="justification" id="justification" cols="30" rows="10"></textarea>
+                        </div>
+                        <button className="green">Reservar</button>
+                    </form>
+                )
+            } else {
+                return (
+                    <form action="">
+                        <div className="d-flex flex-column flex-md-row w-100 gap-3">
+                            <div className="input_group">
+                                <label for="full_name">Nome completo</label>
+                                <input className="textfield" placeholder="Nome completo" type="text" name="full_name" id="full_name" />
+                            </div>
+                            <div className="input_group">
+                                <label for="registration">Matrícula</label>
+                                <input className="textfield" placeholder="Matrícula" type="text" name="registration" id="registration" />
+                            </div>
+                        </div>
+                        <div className="d-flex w-100 gap-3">
+                            <div className="input_group">
+                                <label for="period">Período</label>
+                                <select name="period" id="period">
+                                    <option value="AB1">AB | MANHÃ</option>
+                                    <option value="CD1">CD | MANHÃ</option>
+                                    <option value="AB2">AB | TARDE</option>
+                                    <option value="CD2">CD | TARDE</option>
+                                </select>
+                            </div>
+                            <div className="input_group">
+                                <label for="init_date">Hoje</label>
+                                <input className="textfield" type="date" name="init_date" value={moment().format("YYYY-MM-DD")} readOnly id="init_date" />
+                            </div>
+                        </div>
+                        <div className="d-flex justify-content-between w-100">
+                            <div className="input_group">
+                                <label for="activity">Atividade</label>
+                                <select name="activity" id="activity">
+                                    <option value="Estudar com amigos">Estudar com amigos</option>
+                                    <option value="Descansar">Descansar depois de um dia chato</option>
+                                    <option value="Sei lá mano">Sei lá mano</option>
+                                    <option value="Fofocar">Fofocar</option>
+                                </select>
+                            </div>
+                            <div className="input_group align-items-end">
+                                <label for="people">Nº de pessoas</label>
+                                <input className="textfield w-50" placeholder="Nº" type="number" name="people" id="people" />
+                            </div>
+                        </div>
+                        <div className="input_group">
+                            <label for="justification">Justificativa</label>
+                            <textarea name="justification" id="justification" cols="30" rows="10"></textarea>
+                        </div>
+                        <button className="green">Reservar</button>
+                    </form>
+                )
+            }
+        } else {
+            if (admin) {
+                return (
+                    <form action="">
+                        <div className="d-flex flex-column flex-md-row w-100 gap-3">
+                            <div className="input_group">
+                                <label for="full_name">Nome completo</label>
+                                <input className="textfield" placeholder="Nome completo" value={"Yuri Silva de Lima"} readOnly type="text" name="full_name" id="full_name" />
+                            </div>
+                            <div className="input_group">
+                                <label for="registration">Matrícula</label>
+                                <input className="textfield" placeholder="Matrícula" value={"512314"} readOnly type="text" name="registration" id="registration" />
+                            </div>
+                        </div>
+                        <div className="d-flex w-100 gap-3">
+                            <div className="input_group">
+                                <label for="period">Período</label>
+                                <select name="period" disabled="true" id="period">
+                                    <option value="AB1" selected>AB | MANHÃ</option>
+                                    <option value="CD1">CD | MANHÃ</option>
+                                    <option value="AB2">AB | TARDE</option>
+                                    <option value="CD2">CD | TARDE</option>
+                                </select>
+                            </div>
+                            <div className="input_group">
+                                <label for="init_date">Data inicial</label>
+                                <input className="textfield" type="date" name="init_date" value={moment().format("YYYY-MM-DD")} readOnly id="init_date" />
+                            </div>
+                            <div className="input_group">
+                                <label for="end_date">Data final</label>
+                                <input className="textfield" type="date" name="end_date" value={"2023-06-13"} readOnly id="end_date" />
+                            </div>
+                        </div>
+                        <div className="d-flex justify-content-between w-100">
+                            <div className="input_group">
+                                <label for="activity">Atividade</label>
+                                <select name="activity" id="activity" disabled="true">
+                                    <option value="Estudar com amigos">Estudar com amigos</option>
+                                    <option value="Descansar" selected>Descansar depois de um dia chato</option>
+                                    <option value="Sei lá mano">Sei lá mano</option>
+                                    <option value="Fofocar">Fofocar</option>
+                                </select>
+                            </div>
+                            <div className="input_group align-items-end">
+                                <label for="people">Nº de pessoas</label>
+                                <input className="textfield w-50" placeholder="Nº" type="number" name="people" id="people" value={2} readOnly/>
+                            </div>
+                        </div>
+                        <div className="input_group">
+                            <label for="justification">Justificativa</label>
+                            <textarea name="justification" id="justification" value={"Cansei vetes"} cols="30" rows="10" readOnly></textarea>
+                        </div>
+                        <button className="green">Reservar</button>
+                    </form>
+                )
+            }
+        }
+    }
+
     const configureModalReserva = () => {
         return (
             <ModalBody isOpen={modalReserva}>
-                <ModalHeader title={admin ? !disponivel ? "Ver reserva" : "Fazer reserva" : "Fazer reserva"} onClose={closeModalReserva} />
+                <ModalHeader title={admin ? !disponivel ? "Ver reserva" : "Fazer reserva" : "Fazer reserva"} subtitle={`${nome}, BLOCO ${bloco}`} onClose={closeModalReserva} />
                 <ModalSection>
-                    {admin ?
-                        <form action="">
-                            <div className="d-flex flex-column flex-md-row w-100 gap-3">
-                                <div className="input_group">
-                                    <label for="full_name">Nome completo</label>
-                                    <input className="textfield" placeholder="Nome completo" type="text" name="full_name" id="full_name" />
-                                </div>
-                                <div className="input_group">
-                                    <label for="registration">Matrícula</label>
-                                    <input className="textfield" placeholder="Matrícula" type="text" name="registration" id="registration" />
-                                </div>
-                            </div>
-                            <div className="d-flex w-100 gap-3">
-                                <div className="input_group">
-                                    <label for="period">Período</label>
-                                    <select name="period" id="period">
-                                        <option value="AB1">AB | MANHÃ</option>
-                                        <option value="CD1">CD | MANHÃ</option>
-                                        <option value="AB2">AB | TARDE</option>
-                                        <option value="CD2">CD | TARDE</option>
-                                    </select>
-                                </div>
-                                <div className="input_group">
-                                    <label for="init_date">Data inicial</label>
-                                    <input className="textfield" type="date" name="init_date" value={moment().format("YYYY-MM-DD")} readOnly id="init_date" />
-                                </div>
-                                <div className="input_group">
-                                    <label for="end_date">Data final</label>
-                                    <input className="textfield" type="date" name="end_date" id="end_date" />
-                                </div>
-                            </div>
-                            <div className="d-flex justify-content-between w-100">
-                                <div className="input_group">
-                                    <label for="activity">Atividade</label>
-                                    <select name="activity" id="activity">
-                                        <option value="Estudar com amigos">Estudar com amigos</option>
-                                        <option value="Descansar">Descansar depois de um dia chato</option>
-                                        <option value="Sei lá mano">Sei lá mano</option>
-                                        <option value="Fofocar">Fofocar</option>
-                                    </select>
-                                </div>
-                                <div className="input_group align-items-end">
-                                    <label for="people">Nº de pessoas</label>
-                                    <input className="textfield w-50" placeholder="Nº" type="number" name="people" id="people" />
-                                </div>
-                            </div>
-                            <div className="input_group">
-                                <label for="justification">Justificativa</label>
-                                <textarea name="justification" id="justification" cols="30" rows="10"></textarea>
-                            </div>
-                            <button className="green">Reservar</button>
-                        </form>
-                        :
-                        <form action="">
-                            <div className="d-flex flex-column flex-md-row w-100 gap-3">
-                                <div className="input_group">
-                                    <label for="full_name">Nome completo</label>
-                                    <input className="textfield" placeholder="Nome completo" type="text" name="full_name" id="full_name" />
-                                </div>
-                                <div className="input_group">
-                                    <label for="registration">Matrícula</label>
-                                    <input className="textfield" placeholder="Matrícula" type="text" name="registration" id="registration" />
-                                </div>
-                            </div>
-                            <div className="d-flex w-100 gap-3">
-                                <div className="input_group">
-                                    <label for="period">Período</label>
-                                    <select name="period" id="period">
-                                        <option value="AB1">AB | MANHÃ</option>
-                                        <option value="CD1">CD | MANHÃ</option>
-                                        <option value="AB2">AB | TARDE</option>
-                                        <option value="CD2">CD | TARDE</option>
-                                    </select>
-                                </div>
-                                <div className="input_group">
-                                    <label for="init_date">Hoje</label>
-                                    <input className="textfield" type="date" name="init_date" value={moment().format("YYYY-MM-DD")} readOnly id="init_date" />
-                                </div>
-                            </div>
-                            <div className="d-flex justify-content-between w-100">
-                                <div className="input_group">
-                                    <label for="activity">Atividade</label>
-                                    <select name="activity" id="activity">
-                                        <option value="Estudar com amigos">Estudar com amigos</option>
-                                        <option value="Descansar">Descansar depois de um dia chato</option>
-                                        <option value="Sei lá mano">Sei lá mano</option>
-                                        <option value="Fofocar">Fofocar</option>
-                                    </select>
-                                </div>
-                                <div className="input_group align-items-end">
-                                    <label for="people">Nº de pessoas</label>
-                                    <input className="textfield w-50" placeholder="Nº" type="number" name="people" id="people" />
-                                </div>
-                            </div>
-                            <div className="input_group">
-                                <label for="justification">Justificativa</label>
-                                <textarea name="justification" id="justification" cols="30" rows="10"></textarea>
-                            </div>
-                            <button className="green">Reservar</button>
-                        </form>
-                    }
+                    {configureFormsReserva()}
                 </ModalSection>
             </ModalBody>
         )
@@ -160,6 +226,9 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
         if (disponivel) {
             return configureModalReserva()
         } else {
+            if (admin) {
+                return configureModalReserva()
+            }
             return <ModalQueixa isOpen={modalQueixa} onClose={closeModalQueixa} />
         }
     }
@@ -187,10 +256,10 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                     <h1 className={disponivel ? "disponivel" : "indisponivel"}>{disponivel ? "disponivel" : "reservado"}</h1>
                     {disponivel ?
                         <button className="green" onClick={openModalReserva}>Fazer Reserva</button>
-                        : !admin ?
-                            <button className="red" onClick={openModalQueixa}>Fazer Queixa</button>
-                            :
+                        : admin ?
                             <button className="red" onClick={openModalReserva}>Ver reserva</button>
+                            :
+                            <button className="red" onClick={openModalQueixa}>Fazer Queixa</button>
                     }
                 </header>
                 <aside>
