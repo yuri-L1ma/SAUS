@@ -60,10 +60,8 @@ a.active{
 }
 
 .menu-colapse .dontbreak {
-    position: absolute;
-    display: flex;
-    flex-wrap: nowrap;
-    top: 0;
+    position: fixed;
+    bottom: 0;
     overflow-x: hidden;
     background: #2376D7;
     right: 0;

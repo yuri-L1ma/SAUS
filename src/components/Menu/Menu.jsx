@@ -1,11 +1,5 @@
 import "./Menu.css"
 import logo from "../../assets/imgs/simplified_logo.png"
-import perfil_icon from "../../assets/icons/user.svg"
-import editar_icon from "../../assets/icons/editar.svg"
-import reservas_icon from "../../assets/icons/calendar.svg"
-import queixas_icon from "../../assets/icons/queixa.svg"
-import config_icon from "../../assets/icons/config.svg"
-import sair_icon from "../../assets/icons/setaSair.svg"
 import bars_icon from "../../assets/icons/bars.svg"
 
 import { NavLink, Link } from "react-router-dom"
@@ -126,53 +120,83 @@ const Menu = () => {
             </nav>
             <nav className="menu-colapse">
                 <div className="dontbreak">
-                    <ul>
-                        <div className="list-item">
-                            <div className="item d-flex gap-3 border-bottom pb-3">
-                                <span className="icon">
-                                    <img src={perfil_icon} alt="" />
-                                </span>
-                                <h4>Meu perfil</h4>
-                            </div>
-                            <div className="d-flex flex-column gap-4 ms-4 my-4">
-                                <div className="item button d-flex gap-2 align-items-center pb-2" style={{ borderBottom: "1px solid #ffffff6c" }}>
-                                    <span className="icon">
-                                        <img src={editar_icon} alt="" />
-                                    </span>
-                                    <h5>Editar</h5>
-                                </div>
-                                <div className="item d-flex gap-2  border-bottom pb-2">
-                                    <span className="icon">
-                                        <img src={reservas_icon} alt="" />
-                                    </span>
-                                    <NavLink onClick={closeMenu} to={"/aluno/reservas"} className={"text-light text-decoration-none"}>
-                                        <h5>Minhas reservas</h5>
+                    <ul className="nav gap-4 flex-nowrap">
+                        <div className="d-flex h-100 flex-column justify-content-between">
+                            <div className="d-flex gap-3 flex-column">
+                                <li className="nav-item">
+                                    <NavLink onClick={closeMenu} to={"/"} className={"nav-link text-light"}>
+                                        <div className="d-flex gap-3">
+                                            <Home size={24} />
+                                            <span>Home</span>
+                                        </div>
                                     </NavLink>
-                                </div>
-                                <div className="item d-flex gap-2 border-bottom pb-2">
-                                    <span className="icon">
-                                        <img src={queixas_icon} alt="" />
-                                    </span>
-                                    <NavLink onClick={closeMenu} to={"/aluno/queixas"} className={"text-light text-decoration-none"}>
-                                        <h5>Minhas queixas</h5>
+                                </li>
+                                {admin ?
+                                    <>
+                                        <li className="nav-item">
+                                            <NavLink onClick={closeMenu} to={"/admin/alunos"} className={"nav-link text-light"}>
+                                                <div className="d-flex gap-3">
+                                                    <Users2 size={24} />
+                                                    <span>Alunos</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                        <li className="nav-item">
+                                            <NavLink onClick={closeMenu} to={"/admin/blocos"} className={"nav-link text-light"}>
+                                                <div className="d-flex gap-3">
+                                                    <Building2 size={24} />
+                                                    <span>Blocos</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                        <li className="nav-item">
+                                            <NavLink onClick={closeMenu} to={"/admin/perfil"} className={"nav-link text-light"}>
+                                                <div className="d-flex gap-3">
+                                                    <UserCircle size={24} />
+                                                    <span>Perfil</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                    </>
+                                    :
+                                    <>
+                                        <li className="nav-item">
+                                            <NavLink onClick={closeMenu} to={"/aluno/reservas"} className={"nav-link text-light"}>
+                                                <div className="d-flex gap-3">
+                                                    <Ticket size={24} />
+                                                    <span>Reservas</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                        <li className="nav-item w-100">
+                                            <NavLink onClick={closeMenu} to={"/aluno/queixas"} className={"nav-link text-light"}>
+                                                <div className="d-flex gap-3">
+                                                    <Megaphone size={24} />
+                                                    <span>Queixas</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                        <li className="nav-item w-100">
+                                            <NavLink onClick={closeMenu} to={"/aluno/perfil"} className={"nav-link text-light"}>
+                                                <div className="d-flex gap-3">
+                                                    <UserCircle size={24} />
+                                                    <span>Perfil</span>
+                                                </div>
+                                            </NavLink>
+                                        </li>
+                                    </>
+                                }
+
+                            </div>
+                            <div>
+                                <li className="nav-item">
+                                    <NavLink onClick={closeMenu} to={"/login"} className={"nav-link bg-danger text-light"}>
+                                        <div className="d-flex gap-3">
+                                            <LogOut size={24} />
+                                            <span>Sair</span>
+                                        </div>
                                     </NavLink>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="list-item">
-                            <div className="item d-flex gap-3 pb-3">
-                                <span className="icon">
-                                    <img src={config_icon} alt="" />
-                                </span>
-                                <h4>Configurações</h4>
-                            </div>
-                        </div>
-                        <div className="list-item">
-                            <div className="item d-flex gap-3 pb-3">
-                                <span className="icon">
-                                    <img src={sair_icon} alt="" />
-                                </span>
-                                <h4>Sair</h4>
+                                </li>
                             </div>
                         </div>
                     </ul>
