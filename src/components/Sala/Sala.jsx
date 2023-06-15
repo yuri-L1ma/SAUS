@@ -1,7 +1,5 @@
 import "./Sala.css"
 import { useState } from "react";
-import ModalQueixa from "../ModalQueixa/ModalQueixa";
-import ModalFeedback from "../ModalFeedback/ModalFeedback";
 import projetor_icon from "../../assets/icons/projetor.svg"
 import ar_icon from "../../assets/icons/ar.svg"
 import { Edit2Icon } from "lucide-react";
@@ -14,11 +12,42 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
     const [modalQueixa, setModalQueixa] = useState(false);
     const [modalReserva, setModalReserva] = useState(false);
     const [modalFeedback, setModalFeedback] = useState(false);
+    const [modalEditSala, setModalEditSala] = useState(false);
+    const [equipaments, setEquipamentos] = useState(equipamentos)
     const { admin } = useContext(ContextoGambiarra)
 
     const toggleActiveClassroom = (sala_componente) => {
         sala_componente.parentElement.classList.toggle("ativo")
     }
+
+    const toogleButtonColor = (event) => {
+        event.preventDefault()
+        const tag = event.target
+        const buttons = document.querySelectorAll(".blocos button")
+
+        if (!tag.classList.contains("ativo")) {
+            for (let button of buttons) {
+                if (button !== tag) {
+                    button.classList.remove("ativo")
+                }
+            }
+
+            tag.classList.toggle("ativo")
+        }
+    }
+
+    const toogleEquipaments = (event) => {
+        const checksBoxs = document.querySelectorAll(".input_group input[type='checkbox']")
+        const equipamentos = []
+
+        for(let checkBox of checksBoxs){
+            equipamentos.push({nome: checkBox.name, existe: checkBox.checked})
+        }
+
+        setEquipamentos(equipamentos)
+    }
+
+
 
     const openModalQueixa = () => {
         setModalQueixa(true);
@@ -42,6 +71,15 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
 
     const closeModalFeeedback = () => {
         setModalFeedback(false);
+    };
+
+    const openModalEditSala = () => {
+        setModalEditSala(true);
+    };
+
+    const closeModalEditSala = () => {
+        setModalEditSala(false);
+        setEquipamentos(equipamentos)
     };
 
     const configureFormsReserva = () => {
@@ -242,23 +280,66 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
         )
     }
 
+    const configureModalEditSala = () => {
+        return (
+            <ModalBody isOpen={modalEditSala}>
+                <ModalHeader title={"Editar sala"} onClose={closeModalEditSala} />
+                <ModalSection>
+                    <form action="">
+                        <div className="d-flex flex-column w-100 flex-md-row justify-content-between gap-4 ">
+                            <div className="input_group">
+                                <label for=" name">Nome da sala</label>
+                                <input className="textfield" type="text" name="name" id="name" defaultValue={nome}/>
+                            </div>
+                            <div className="input_group w-auto">
+                                <label for=" name">Bloco</label>
+                                <div className="blocos d-flex gap-3">
+                                    <button onClick={toogleButtonColor} className="ativo">B1</button>
+                                    <button onClick={toogleButtonColor}>B2</button>
+                                    <button onClick={toogleButtonColor}>B3</button>
+                                    <button onClick={toogleButtonColor}>B4</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="input_group">
+                            <label>Materiais disponíveis</label>
+                            <div className="d-flex flex-column flex-md-row gap-2 border">
+                                {equipaments.map((equipament) => {
+                                    return (
+                                        <div>
+                                            <input type="checkbox" id={equipament.nome} name={equipament.nome} checked={equipament.existe} onChange={toogleEquipaments} />
+                                            <label for={equipament.nome} className="text-capitalize">{equipament.nome}</label>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                        <button className="green">Editar sala</button>
+                    </form>
+                </ModalSection>
+            </ModalBody>
+        )
+    }
+
     const configureModalQueixa = () => {
-        <ModalBody isOpen={modalQueixa}>
-            <ModalHeader title="Fazer Queixa" subtitle={`${nome}, BLOCO ${bloco}`} onClose={closeModalQueixa} />
-            <ModalSection>
-                <form action="">
-                    <div className="input_group">
-                        <label for="Remember">Material com defeito</label>
-                        <input className="textfield" placeholder="Diga o material que tá com defeito" type="email" name="" id="" />
-                    </div>
-                    <div className="input_group">
-                        <label for="Remember">Descrição do defeito</label>
-                        <textarea name="" placeholder="Descreva o problema citado" id="" cols="30" rows="10"></textarea>
-                    </div>
-                    <button>Adicionar</button>
-                </form>
-            </ModalSection>
-        </ModalBody>
+        return (
+            <ModalBody isOpen={modalQueixa}>
+                <ModalHeader title="Fazer Queixa" subtitle={`${nome}, BLOCO ${bloco}`} onClose={closeModalQueixa} />
+                <ModalSection>
+                    <form action="">
+                        <div className="input_group">
+                            <label for="Remember">Material com defeito</label>
+                            <input className="textfield" placeholder="Diga o material que tá com defeito" type="email" name="" id="" />
+                        </div>
+                        <div className="input_group">
+                            <label for="Remember">Descrição do defeito</label>
+                            <textarea name="" placeholder="Descreva o problema citado" id="" cols="30" rows="10"></textarea>
+                        </div>
+                        <button>Adicionar</button>
+                    </form>
+                </ModalSection>
+            </ModalBody>
+        )
     }
 
 
@@ -268,8 +349,9 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
         } else {
             if (admin) {
                 return configureModalReserva()
+            } else {
+                return configureModalQueixa()
             }
-            return <ModalQueixa isOpen={modalQueixa} onClose={closeModalQueixa} />
         }
     }
 
@@ -280,7 +362,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                     <div className="d-flex gap-3 align-items-center">
                         <h1>{nome}</h1>
                         {admin ?
-                            <button className="rounded-button">
+                            <button className="rounded-button" onClick={openModalEditSala}>
                                 <Edit2Icon size={16} />
                             </button>
                             : null}
@@ -309,7 +391,11 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                             <ul className="m-0 p-0">
                                 {
                                     equipamentos.map((equipamento) => {
-                                        return <li className="text-capitalize">{equipamento}</li>
+                                        if(equipamento.existe){
+                                            return <li className="text-capitalize">{equipamento.nome}</li>
+                                        }else{
+                                            return <li className="text-capitalize text-danger">{equipamento.nome}</li>
+                                        }
                                     })
                                 }
                             </ul>
@@ -335,6 +421,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                 </aside>
             </div>
             {configureModalFeedback()}
+            {configureModalEditSala()}
             {qualModal()}
         </>
     )

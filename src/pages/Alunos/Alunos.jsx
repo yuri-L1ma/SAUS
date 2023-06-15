@@ -4,6 +4,8 @@ import Aluno from "../../components/Aluno/Aluno"
 import "./Alunos.css"
 
 const Alunos = () => {
+
+
     const alunos = [
         { nome: "Mario José", matricula: "339383", },
         { nome: "Hercules Lima", matricula: "609868", },
@@ -28,7 +30,7 @@ const Alunos = () => {
                     </form>
                 </div>
                 <section className="alunos mt-4">
-                    <div className="d-flex flex-column gap-4">
+                    <div className="d-flex flex-column flex-wrap flex-md-row gap-4">
                         {
                             alunos.map((aluno) => {
                                 return <Aluno nome={aluno.nome} matricula={aluno.matricula}/>

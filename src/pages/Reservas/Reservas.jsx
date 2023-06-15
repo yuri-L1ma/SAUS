@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom"
 import Reserva from "../../components/Reserva/Reserva"
 
 const Reservas = () => {
-    const reservas = [{ ativa: true }, { ativa: false }, { ativa: false }, { ativa: true }]
+    const reservas = [{sala:{}, aluno:{}, justificativa:"", ativa: true }, { ativa: false }, { ativa: false }, { ativa: true }]
     return (
         <>
             <Menu />

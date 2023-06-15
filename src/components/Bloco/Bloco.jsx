@@ -1,4 +1,4 @@
-import { Maximize2Icon } from "lucide-react"
+import { TrashIcon } from "lucide-react"
 import "./Bloco.css"
 
 const Bloco = ({ nome, qtdSalas }) => {
@@ -9,9 +9,9 @@ const Bloco = ({ nome, qtdSalas }) => {
                     <h1 className="text-nowrap">{nome}</h1>
                     <h1>{qtdSalas} salas</h1>
                 </div>
-                <button className="d-flex align-items-center gap-3 justify-content-center">
-                    <Maximize2Icon size={24} />
-                    <span className="text-nowrap d-none d-md-block">Ver mais</span>
+                <button className="d-flex align-items-center gap-3 justify-content-center red w-auto">
+                    <TrashIcon size={20} />
+                    <span className="text-nowrap d-none d-md-block">Excluir bloco</span>
                 </button>
             </header>
         </div>

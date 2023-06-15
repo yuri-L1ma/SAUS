@@ -2,25 +2,34 @@ import Sala from "../../components/Sala/Sala";
 import Menu from "../../components/Menu/Menu";
 import "./Home.css";
 import { PlusCircle } from "lucide-react";
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
+import { ModalBody, ModalHeader, ModalSection } from "../../components/Modal/Modal";
 
 const Home = () => {
+    const [modalCreateSala, setModalCreateSala] = useState(false)
     const { admin } = useContext(ContextoGambiarra)
 
+    const openModalCreateSala = () => {
+        setModalCreateSala(true)
+    }
+
+    const closeModalCreateSala = () => {
+        setModalCreateSala(false)
+    }
 
     const salas = [
-        { nome: "SALA 1", bloco: "3", disponivel: true, equipamentos: ["projetor", "lousa", "cadeiras"] },
-        { nome: "SALA 2", bloco: "3", disponivel: false, equipamentos: ["projetor", "lousa", "cadeiras"] },
-        { nome: "SALA 3", bloco: "3", disponivel: true, equipamentos: ["projetor", "lousa", "cadeiras"] },
-        { nome: "SALA 4", bloco: "3", disponivel: false, equipamentos: ["projetor", "lousa", "cadeiras"] },
-        { nome: "SALA 5", bloco: "3", disponivel: true, equipamentos: ["projetor", "lousa", "cadeiras"] },
-        { nome: "SALA 6", bloco: "3", disponivel: true, equipamentos: ["projetor", "lousa", "cadeiras"] },
-        { nome: "SALA 7", bloco: "3", disponivel: false, equipamentos: ["projetor", "lousa", "cadeiras"] }
+        { nome: "SALA 1", bloco: "3", disponivel: true, equipamentos: [{nome:"cabo vga", existe: true}, {nome:"cabo hdmi", existe: false}, {nome: "ar-condicionado", existe:true}, {nome:"projetor", existe: true}] },
+        { nome: "SALA 2", bloco: "3", disponivel: false, equipamentos: [{nome:"cabo vga", existe: true}, {nome:"cabo hdmi", existe: true}, {nome: "ar-condicionado", existe:true}, {nome:"projetor", existe: true}] },
+        { nome: "SALA 3", bloco: "3", disponivel: true, equipamentos: [{nome:"cabo vga", existe: true}, {nome:"cabo hdmi", existe: true}, {nome: "ar-condicionado", existe:true}, {nome:"projetor", existe: true}] },
+        { nome: "SALA 4", bloco: "3", disponivel: false, equipamentos: [{nome:"cabo vga", existe: true}, {nome:"cabo hdmi", existe: true}, {nome: "ar-condicionado", existe:true}, {nome:"projetor", existe: true}] },
+        { nome: "SALA 5", bloco: "3", disponivel: true, equipamentos: [{nome:"cabo vga", existe: true}, {nome:"cabo hdmi", existe: true}, {nome: "ar-condicionado", existe:true}, {nome:"projetor", existe: true}] },
+        { nome: "SALA 6", bloco: "3", disponivel: true, equipamentos: [{nome:"cabo vga", existe: true}, {nome:"cabo hdmi", existe: true}, {nome: "ar-condicionado", existe:true}, {nome:"projetor", existe: true}] },
+        { nome: "SALA 7", bloco: "3", disponivel: false, equipamentos: [{nome:"cabo vga", existe: true}, {nome:"cabo hdmi", existe: true}, {nome: "ar-condicionado", existe:true}, {nome:"projetor", existe: true}] }
     ]
 
-
     const toogleButtonColor = (event) => {
+        event.preventDefault()
         const tag = event.target
         const buttons = document.querySelectorAll(".blocos button")
 
@@ -33,6 +42,48 @@ const Home = () => {
 
             tag.classList.toggle("ativo")
         }
+    }
+
+
+    const configureModalCreateSala = () => {
+        return (
+            <ModalBody isOpen={modalCreateSala}>
+                <ModalHeader title={"Adicionar sala"} onClose={closeModalCreateSala} />
+                <ModalSection>
+                    <form action="">
+                        <div className="d-flex flex-column w-100 flex-md-row justify-content-between gap-4 ">
+                            <div className="input_group">
+                                <label for=" name">Nome da sala</label>
+                                <input className="textfield" type="text" name="name" id="name" />
+                            </div>
+                            <div className="input_group w-auto">
+                                <label for=" name">Bloco</label>
+                                <div className="blocos d-flex gap-3">
+                                    <button onClick={toogleButtonColor} className="ativo">B1</button>
+                                    <button onClick={toogleButtonColor}>B2</button>
+                                    <button onClick={toogleButtonColor}>B3</button>
+                                    <button onClick={toogleButtonColor}>B4</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="input_group">
+                            <label>Materiais disponíveis</label>
+                            <div className="d-flex flex-column flex-md-row gap-2 border">
+                                {salas[0].equipamentos.map((equipamento) => {
+                                    return (
+                                        <div>
+                                            <input type="checkbox" id={equipamento.nome} name={equipamento.nome} />
+                                            <label for={equipamento.nome} className="text-capitalize">{equipamento.nome}</label>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                        <button className="green">Criar sala</button>
+                    </form>
+                </ModalSection>
+            </ModalBody>
+        )
     }
 
     return (
@@ -71,7 +122,7 @@ const Home = () => {
                     <div className="d-flex w-100 align-items-center justify-content-between mb-3 ms-1">
                         <h5>Salas</h5>
                         {admin ?
-                            <button className="d-flex gap-3 outlined w-auto">
+                            <button className="d-flex gap-3 outlined w-auto" onClick={openModalCreateSala}>
                                 <PlusCircle size={24} />
                                 <span>Adicionar sala</span>
                             </button>
@@ -85,6 +136,7 @@ const Home = () => {
                             })
                         }
                     </div>
+                    {configureModalCreateSala()}
                 </section>
             </main>
         </>

@@ -26,7 +26,7 @@ salas[0].periodos.push(periodo0)
 let alunos = [
   new AlunoModel("Anderson", "alu@alu.com", "12345", 515027, "DD", 5, []),
   new AlunoModel("Yuri", "est@est.com", "54321", 584725, "DD", 5, []),
-  new AlunoModel("Sávila", "sav@sav.com", "56789", 524731, "DD", 5, []),
+  new AlunoModel("Sávila Yuri", "sav@sav.com", "56789", 524731, "DD", 5, []),
 ]
 
 

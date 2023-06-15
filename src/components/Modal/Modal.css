@@ -15,7 +15,8 @@
   .modal_content {
     background-color: #fefefe;
     width: 90%;
-    height: 70%;
+    height: auto !important;
+    max-height: 90%;
     border-radius: 10px;
     position: relative;
     overflow: auto;
@@ -43,8 +44,8 @@
   .modal_header .modal_title span {
     color: white;
     font-size: 1.1rem;
-    font-weight: 400;
-    transform: translateX(-10px);
+    font-weight: 600;
+    transform: translate(-10px, 1.5px)
   }
   
   .modal_header button {
@@ -60,6 +61,7 @@
   
   .modal_section {
     width: 90%;
+    height: auto;
     margin: auto;
     padding: 30px 0;
   }

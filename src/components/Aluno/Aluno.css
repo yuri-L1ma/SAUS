@@ -1,6 +1,7 @@
 .aluno{
     border: 1px solid #2376D7;
     border-radius: 10px;
+    flex-grow: 1;
 }
 
 .aluno header{
@@ -21,12 +22,43 @@
     font-weight: bolder;
 }
 
-.aluno button{
-    width: 100%;
-    max-width: 150px;
-    /* min-width: 200px !important; */
+
+ .buttonAluno{
+    border: 1px solid #2376D7;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: none;
+    transition: all 0.2s ease;
 }
 
+ .buttonAluno h4{
+    font-weight: bolder;
+    color: #2376D7;
+    font-size: 1.2rem;
+}
+
+ .buttonAluno svg{
+    /* transform: rotateZ(-90deg); */
+    transition: transform 0.2s ease;
+}
+
+ .buttonAluno.focused{
+    background: #2376D7;
+}
+
+ .buttonAluno.focused h4{
+    color: #fff;
+}
+
+ .buttonAluno.focused svg{
+    filter: brightness(0) invert(1);
+    transform: rotateZ(180deg);
+}
 @media screen and (max-width: 768px) {
     .aluno button{
         width: 100px;

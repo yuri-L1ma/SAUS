@@ -60,14 +60,14 @@ button.red {
   background: #E74C3C;
 }
 
-button.outlined{
+button.outlined {
   background: none;
   border: 1px solid #2376D7;
   color: #2376D7;
   font-weight: 600;
 }
 
-button.gambiarra{
+button.gambiarra {
   background: #305C90;
 }
 
@@ -77,7 +77,7 @@ button.rounded-button {
   padding: 0;
   border-radius: 50%;
   background: none;
-  color:  black;
+  color: black;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -87,7 +87,7 @@ form {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 15px;
+  gap: 2rem;
   /* margin: 20px 0; */
 }
 
@@ -106,9 +106,13 @@ form .input_radio {
 }
 
 form input[type="checkbox"] {
-  width: 25px;
+  width: 30px;
   border-radius: 20px;
   border-color: #2376D7;
+}
+
+form input[type="checkbox"]+label {
+  color: black;
 }
 
 form select {
@@ -118,7 +122,9 @@ form select {
   font-weight: 400;
   border-radius: 10px;
   font-size: 1rem;
-  padding: 1rem;
+  height: 100%;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
 }
 
 
@@ -141,7 +147,7 @@ form textarea {
   width: 100%;
   resize: none;
   height: 100%;
-}	
+}
 
 #root {
   height: 100%;
