@@ -8,7 +8,7 @@ import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
 import { ModalBody, ModalHeader, ModalSection } from "../Modal/Modal";
 import moment from "moment/moment";
 
-const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
+const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
     const [modalQueixa, setModalQueixa] = useState(false);
     const [modalReserva, setModalReserva] = useState(false);
     const [modalFeedback, setModalFeedback] = useState(false);
@@ -18,6 +18,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
 
     const toggleActiveClassroom = (sala_componente) => {
         sala_componente.parentElement.classList.toggle("ativo")
+        console.log(period, date)
     }
 
     const toogleButtonColor = (event) => {
@@ -154,16 +155,11 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                         <div className="d-flex flex-column flex-md-row w-100 gap-3">
                             <div className="input_group">
                                 <label for="period">Período</label>
-                                <select name="period" id="period">
-                                    <option value="AB1">AB | MANHÃ</option>
-                                    <option value="CD1">CD | MANHÃ</option>
-                                    <option value="AB2">AB | TARDE</option>
-                                    <option value="CD2">CD | TARDE</option>
-                                </select>
+                                <input className="textfield" type="text" value={period.name} readOnly/>
                             </div>
                             <div className="input_group">
-                                <label for="init_date">Hoje</label>
-                                <input className="textfield" type="date" name="init_date" value={moment().format("YYYY-MM-DD")} readOnly id="init_date" />
+                                <label for="init_date">Data</label>
+                                <input className="textfield" type="date" name="init_date" value={date} readOnly id="init_date" />
                             </div>
                         </div>
                         <div className="d-flex justify-content-between w-100">
@@ -314,6 +310,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos }) => {
                                 })}
                             </div>
                         </div>
+                        <button className="red">Apagar sala</button>
                         <button className="green">Editar sala</button>
                     </form>
                 </ModalSection>

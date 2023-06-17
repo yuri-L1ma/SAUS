@@ -1,9 +1,11 @@
-import { useRef } from "react"
+import { useContext, useRef } from "react"
 import "./Reserva.css"
-import { XIcon } from "lucide-react"
+import { XIcon, TrashIcon } from "lucide-react"
+import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
 
 const Reserva = ({ ativa }) => {
     const reservaRef = useRef(null)
+    const { admin } = useContext(ContextoGambiarra)
 
     const toggleActiveReserve = (event) => {
         event.preventDefault()
@@ -58,10 +60,18 @@ const Reserva = ({ ativa }) => {
                                 <textarea name="" readOnly value={"Estudar é bom e é porque é"} id="" cols="10" rows="5"></textarea>
                             </div>
                         </div>
-                        <button onClick={toggleActiveReserve} className="d-flex gap-2 justify-content-around d-md-none">
-                            <XIcon size={24} />
-                            <span>Fechar</span>
-                        </button>
+                        <div className="d-flex w-100 justify-content-between justify-content-md-end">
+                            {!admin ?
+                                <button onClick={toggleActiveReserve} className="d-flex gap-2 justify-content-around align-self-end w-auto red">
+                                    <TrashIcon size={24} />
+                                    <span>Cancelar reserva</span>
+                                </button>
+                                : null}
+                            <button onClick={toggleActiveReserve} className="d-flex gap-2 justify-content-center w-auto d-md-none">
+                                <XIcon size={24} />
+                                <span>Fechar</span>
+                            </button>
+                        </div>
                     </form>
                 </section>
             </aside>
