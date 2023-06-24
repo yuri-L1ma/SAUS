@@ -1,24 +1,48 @@
 var express = require('express');
 var router = express.Router();
-var salaService = require("../services/sala.service")
+var salaServiceMongo = require("../services/sala.service.mongo")
 
 
 router.get(
     "/listar"
     ,
     (req, res, next) => {
-        res.json(salaService.listar())
+        salaServiceMongo.listar(req, res)
     }
 )
 
-
-router.post (
-    "/reserva/:id"
+router.post(
+    "/criar"
     ,
     (req, res, next) => {
-        const sala = salaService.reservar(req.params.id, req.body)
-        res.json(sala)
+        salaServiceMongo.criar(req, res)
     }
 )
+
+
+router.get(
+    "/retrieve/:id"
+    ,
+    (req, res, next) => {
+        salaServiceMongo.retrieve(req, res)
+    }
+)
+
+router.put(
+    "/atualizar/:id"
+    ,
+    (req, res, next) => {
+        salaServiceMongo.atualizar(req, res)
+    }
+)
+
+router.delete(
+    "/remover/:id"
+    ,
+    (req, res, next) => {
+        salaServiceMongo.remover(req, res)
+    }
+)
+
 
 module.exports = router;
