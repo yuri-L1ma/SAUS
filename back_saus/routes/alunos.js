@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var alunoService = require("../services/aluno.service")
+
+//VERSÃO SEM MONGOOSE
+/*
+var alunoService = require("../services/servicesMongo/aluno.service.mongo")
 var loginRouter = require ("../routes/login")
 
 
@@ -19,5 +22,8 @@ router.get(
         res.json(alunoService.verReservas(req.params.matricula))
     }
 )
+*/
+
+//VERSÃO COM MONGOOSE --- Colocar Abaixo daqui
 
 module.exports = router
