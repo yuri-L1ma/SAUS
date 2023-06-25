@@ -1,5 +1,5 @@
 import "./Sala.css"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import projetor_icon from "../../assets/icons/projetor.svg"
 import ar_icon from "../../assets/icons/ar.svg"
 import { Edit2Icon } from "lucide-react";
@@ -7,14 +7,29 @@ import { useContext } from "react"
 import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
 import { ModalBody, ModalHeader, ModalSection } from "../Modal/Modal";
 import moment from "moment/moment";
+import axios from "axios";
 
-const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
+const Sala = ({ sala, period, date }) => {
     const [modalQueixa, setModalQueixa] = useState(false);
     const [modalReserva, setModalReserva] = useState(false);
     const [modalFeedback, setModalFeedback] = useState(false);
     const [modalEditSala, setModalEditSala] = useState(false);
-    const [equipaments, setEquipamentos] = useState(equipamentos)
+    const [blocos, setBlocos] = useState([])
+    const [materiais, setMateriais] = useState(sala.materiais)
     const { admin } = useContext(ContextoGambiarra)
+
+    useEffect(() => {
+        initComponents()
+    }, [])
+
+    const initComponents = async () => {
+        try {
+            let blocos = await axios.get("http://localhost:3002/blocos/listar")
+            setBlocos(blocos.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const toggleActiveClassroom = (sala_componente) => {
         sala_componente.parentElement.classList.toggle("ativo")
@@ -37,17 +52,16 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
         }
     }
 
-    const toogleEquipaments = (event) => {
+    const toogleMateriais = (event) => {
         const checksBoxs = document.querySelectorAll(".input_group input[type='checkbox']")
-        const equipamentos = []
+        const materiais = []
 
-        for(let checkBox of checksBoxs){
-            equipamentos.push({nome: checkBox.name, existe: checkBox.checked})
+        for (let checkBox of checksBoxs) {
+            materiais.push({ nome: checkBox.name, status: checkBox.checked })
         }
 
-        setEquipamentos(equipamentos)
+        setMateriais(materiais)
     }
-
 
 
     const openModalQueixa = () => {
@@ -80,11 +94,11 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
 
     const closeModalEditSala = () => {
         setModalEditSala(false);
-        setEquipamentos(equipamentos)
+        setMateriais(sala.materiais)
     };
 
     const configureFormsReserva = () => {
-        if (disponivel) {
+        if (sala.disponivel) {
             if (admin) {
                 return (
                     <form action="">
@@ -155,7 +169,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
                         <div className="d-flex flex-column flex-md-row w-100 gap-3">
                             <div className="input_group">
                                 <label for="period">Período</label>
-                                <input className="textfield" type="text" value={period.name} readOnly/>
+                                <input className="textfield" type="text" value={period.name} readOnly />
                             </div>
                             <div className="input_group">
                                 <label for="init_date">Data</label>
@@ -247,7 +261,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
     const configureModalReserva = () => {
         return (
             <ModalBody isOpen={modalReserva}>
-                <ModalHeader title={admin ? !disponivel ? "Ver reserva" : "Fazer reserva" : "Fazer reserva"} subtitle={`${nome}, BLOCO ${bloco}`} onClose={closeModalReserva} />
+                <ModalHeader title={admin ? !sala.disponivel ? "Ver reserva" : "Fazer reserva" : "Fazer reserva"} subtitle={`${sala.nome}, BLOCO ${sala.bloco.numero}`} onClose={closeModalReserva} />
                 <ModalSection>
                     {configureFormsReserva()}
                 </ModalSection>
@@ -258,7 +272,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
     const configureModalFeedback = () => {
         return (
             <ModalBody isOpen={modalFeedback}>
-                <ModalHeader title="Adicionar Feedback" subtitle={`${nome}, BLOCO ${bloco}`} onClose={closeModalFeeedback} />
+                <ModalHeader title="Adicionar Feedback" subtitle={`${sala.nome}, BLOCO ${sala.bloco.numero}`} onClose={closeModalFeeedback} />
                 <ModalSection>
                     <form action="">
                         <div className="input_group">
@@ -276,42 +290,83 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
         )
     }
 
+    const handleUpdateSala = (event) => {
+        event.preventDefault()
+
+
+        const nome = document.querySelector("#name").value
+        const bloco = document.querySelector("#bloco.ativo").getAttribute("data-bloco-id")
+        const capacidade = document.querySelector("#capacity").value
+
+        console.log(nome, bloco, capacidade, materiais)
+
+
+        axios.put(`http://localhost:3002/salas/atualizar/${sala._id}`, { nome, bloco, disponivel: true, capacidade, materiais, periodos: [] }).then((response) => {
+            closeModalEditSala()
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+
+    const handleDeleteSala = (event) => {
+        event.preventDefault()
+
+        axios.delete(`http://localhost:3002/salas/remover/${sala._id}`).then((response) => {
+            alert("Sala removida com sucesso")
+            closeModalEditSala()
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+
     const configureModalEditSala = () => {
         return (
             <ModalBody isOpen={modalEditSala}>
                 <ModalHeader title={"Editar sala"} onClose={closeModalEditSala} />
                 <ModalSection>
-                    <form action="">
+                    <form>
                         <div className="d-flex flex-column w-100 flex-md-row justify-content-between gap-4 ">
                             <div className="input_group">
                                 <label for=" name">Nome da sala</label>
-                                <input className="textfield" type="text" name="name" id="name" defaultValue={nome}/>
+                                <input className="textfield" type="text" name="name" id="name" defaultValue={sala.nome} />
                             </div>
                             <div className="input_group w-auto">
-                                <label for=" name">Bloco</label>
+                                <label for=" name">Bloco {sala.bloco.numero}</label>
                                 <div className="blocos d-flex gap-3">
-                                    <button onClick={toogleButtonColor} className="ativo">B1</button>
-                                    <button onClick={toogleButtonColor}>B2</button>
-                                    <button onClick={toogleButtonColor}>B3</button>
-                                    <button onClick={toogleButtonColor}>B4</button>
+                                    {blocos.map((bloco) => {
+                                        if (bloco._id === sala.bloco._id) {
+                                            return (
+                                                <button type="submit" onClick={toogleButtonColor} className="ativo" id="bloco" data-bloco-id={bloco._id}>B{bloco.numero}</button>
+                                            )
+                                        }
+
+                                        return (
+                                            <button type="submit" onClick={toogleButtonColor} id="bloco" data-bloco-id={bloco._id}>B{bloco.numero}</button>
+                                        )
+
+                                    })}
                                 </div>
                             </div>
                         </div>
                         <div className="input_group">
+                            <label for=" name">Capacidade</label>
+                            <input className="textfield" type="number" name="capacity" id="capacity" defaultValue={sala.capacidade}/>
+                        </div>
+                        <div className="input_group">
                             <label>Materiais disponíveis</label>
                             <div className="d-flex flex-column flex-md-row gap-2 border">
-                                {equipaments.map((equipament) => {
+                                {materiais.map((material) => {
                                     return (
                                         <div>
-                                            <input type="checkbox" id={equipament.nome} name={equipament.nome} checked={equipament.existe} onChange={toogleEquipaments} />
-                                            <label for={equipament.nome} className="text-capitalize">{equipament.nome}</label>
+                                            <input type="checkbox" id={material.nome} name={material.nome} checked={material.status} value={material.nome} onChange={toogleMateriais} />
+                                            <label for={material.nome} className="text-capitalize">{material.nome}</label>
                                         </div>
                                     )
                                 })}
                             </div>
                         </div>
-                        <button className="red">Apagar sala</button>
-                        <button className="green">Editar sala</button>
+                        <button className="red" onClick={handleDeleteSala}>Apagar sala</button>
+                        <button className="green" onClick={handleUpdateSala}>Editar sala</button>
                     </form>
                 </ModalSection>
             </ModalBody>
@@ -321,7 +376,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
     const configureModalQueixa = () => {
         return (
             <ModalBody isOpen={modalQueixa}>
-                <ModalHeader title="Fazer Queixa" subtitle={`${nome}, BLOCO ${bloco}`} onClose={closeModalQueixa} />
+                <ModalHeader title="Fazer Queixa" subtitle={`${sala.nome}, BLOCO ${sala.bloco.numero}`} onClose={closeModalQueixa} />
                 <ModalSection>
                     <form action="">
                         <div className="input_group">
@@ -341,7 +396,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
 
 
     const qualModal = () => {
-        if (disponivel) {
+        if (sala.disponivel) {
             return configureModalReserva()
         } else {
             if (admin) {
@@ -357,7 +412,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
             <div className="sala">
                 <header onClick={(event) => toggleActiveClassroom(event.target)}>
                     <div className="d-flex gap-3 align-items-center">
-                        <h1>{nome}</h1>
+                        <h1>{sala.nome}</h1>
                         {admin ?
                             <button className="rounded-button" onClick={openModalEditSala}>
                                 <Edit2Icon size={16} />
@@ -372,8 +427,8 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
                             <img src={ar_icon} alt="" />
                         </span>
                     </div>
-                    <h1 className={disponivel ? "disponivel" : "indisponivel"}>{disponivel ? "disponivel" : "reservado"}</h1>
-                    {disponivel ?
+                    <h1 className={sala.disponivel ? "disponivel" : "indisponivel"}>{sala.disponivel ? "disponivel" : "reservado"}</h1>
+                    {sala.disponivel ?
                         <button className="green" onClick={openModalReserva}>Fazer Reserva</button>
                         : admin ?
                             <button className="red" onClick={openModalReserva}>Ver reserva</button>
@@ -387,11 +442,11 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
                             <span>Materiais da sala</span>
                             <ul className="m-0 p-0">
                                 {
-                                    equipamentos.map((equipamento) => {
-                                        if(equipamento.existe){
-                                            return <li className="text-capitalize">{equipamento.nome}</li>
-                                        }else{
-                                            return <li className="text-capitalize text-danger">{equipamento.nome}</li>
+                                    sala.materiais.map((material) => {
+                                        if (material.status) {
+                                            return <li className="text-capitalize">{material.nome}</li>
+                                        } else {
+                                            return <li className="text-capitalize text-danger">{material.nome}</li>
                                         }
                                     })
                                 }
@@ -399,7 +454,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
                         </div>
                         <div>
                             <span>Capacidade</span>
-                            <p>45 pessoas</p>
+                            <p>{sala.capacidade}</p>
                         </div>
                     </section>
                     <div className="d-flex w-100 gap-2 justify-content-end">
@@ -407,7 +462,7 @@ const Sala = ({ disponivel, bloco, nome, equipamentos, period, date }) => {
                             <button className="outlined" onClick={openModalFeedback}>Dar feedback</button>
                             : null
                         }
-                        {disponivel ?
+                        {sala.disponivel ?
                             <button className="green d-md-none" onClick={openModalReserva}>Fazer Reserva</button>
                             : admin ?
                                 <button className="red d-md-none" onClick={openModalReserva}>Ver reserva</button>

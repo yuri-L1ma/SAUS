@@ -3,22 +3,40 @@ import Bloco from "../../components/Bloco/Bloco"
 import "./Blocos.css"
 import { NavLink } from "react-router-dom"
 import seta_azul from "../../assets/icons/setaAzul.svg"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
 import { ModalBody, ModalHeader, ModalSection } from "../../components/Modal/Modal"
 import { PlusCircle } from "lucide-react"
+import axios from "axios"
 
 
 const Blocos = () => {
+    const [blocos, setBlocos] = useState([])
     const [modalCreateBloco, setModalCreateBloco] = useState(false)
     const { admin } = useContext(ContextoGambiarra)
 
-    const blocos = [
-        { nome: "BLOCO 1", qtdSalas: "12", },
-        { nome: "BLOCO 2", qtdSalas: "12", },
-        { nome: "BLOCO 3", qtdSalas: "12", },
-        { nome: "BLOCO 4", qtdSalas: "12", },
-    ]
+    useEffect(() => {
+        axios.get("http://localhost:3002/blocos/listar").then((response) => {
+            setBlocos(response.data)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }, [])
+
+    const handleCreateBloco = (event) => {
+        event.preventDefault()
+
+        const numero = document.getElementById("numero").value
+        const descricao = document.getElementById("description").value
+
+        axios.post("http://localhost:3002/blocos/criar", {numero, descricao, salas: []}).then((response) => {
+            alert("Bloco cadastrado com sucesso!")
+            closeModalCreateBloco()
+            // window.location.reload()
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
 
     const openModalCreateBloco = () => {
         setModalCreateBloco(true)
@@ -33,14 +51,18 @@ const Blocos = () => {
             <ModalBody isOpen={modalCreateBloco}>
                 <ModalHeader title={"Adicionar bloco"} onClose={closeModalCreateBloco} />
                 <ModalSection>
-                    <form action="">
+                    <form>
                         <div className="d-flex flex-column w-100 flex-md-row justify-content-between gap-4 ">
                             <div className="input_group">
-                                <label for=" name">Nome do bloco</label>
-                                <input className="textfield" type="text" name="name" id="name" />
+                                <label for=" name">Número</label>
+                                <input className="textfield" type="number" name="numero" id="numero" />
+                            </div>
+                            <div className="input_group">
+                                <label for=" name">Descrição</label>
+                                <input className="textfield" type="text" name="description" id="description" />
                             </div>
                         </div>
-                        <button className="green">Criar bloco</button>
+                        <button className="green" onClick={handleCreateBloco}>Criar bloco</button>
                     </form>
                 </ModalSection>
             </ModalBody>
@@ -74,7 +96,7 @@ const Blocos = () => {
                     <div className="d-flex flex-column gap-4">
                         {
                             blocos.map((bloco) => {
-                                return <Bloco nome={bloco.nome} qtdSalas={bloco.qtdSalas} />
+                                return <Bloco bloco={bloco} />
                             })
                         }
                     </div>

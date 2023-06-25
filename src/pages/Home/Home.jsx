@@ -6,26 +6,18 @@ import { useContext, useEffect, useState } from "react"
 import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
 import { ModalBody, ModalHeader, ModalSection } from "../../components/Modal/Modal";
 import moment from "moment/moment";
+import axios from "axios";
 
 const Home = () => {
-    const [salas, setSalas] = useState(
-        [
-            { nome: "SALA 1", bloco: "3", disponivel: true, equipamentos: [{ nome: "cabo vga", existe: true }, { nome: "cabo hdmi", existe: false }, { nome: "ar-condicionado", existe: true }, { nome: "projetor", existe: true }] },
-            { nome: "SALA 2", bloco: "3", disponivel: false, equipamentos: [{ nome: "cabo vga", existe: true }, { nome: "cabo hdmi", existe: true }, { nome: "ar-condicionado", existe: true }, { nome: "projetor", existe: true }] },
-            { nome: "SALA 3", bloco: "3", disponivel: true, equipamentos: [{ nome: "cabo vga", existe: true }, { nome: "cabo hdmi", existe: true }, { nome: "ar-condicionado", existe: true }, { nome: "projetor", existe: true }] },
-            { nome: "SALA 4", bloco: "3", disponivel: false, equipamentos: [{ nome: "cabo vga", existe: true }, { nome: "cabo hdmi", existe: true }, { nome: "ar-condicionado", existe: true }, { nome: "projetor", existe: true }] },
-            { nome: "SALA 5", bloco: "3", disponivel: true, equipamentos: [{ nome: "cabo vga", existe: true }, { nome: "cabo hdmi", existe: true }, { nome: "ar-condicionado", existe: true }, { nome: "projetor", existe: true }] },
-            { nome: "SALA 6", bloco: "3", disponivel: true, equipamentos: [{ nome: "cabo vga", existe: true }, { nome: "cabo hdmi", existe: true }, { nome: "ar-condicionado", existe: true }, { nome: "projetor", existe: true }] },
-            { nome: "SALA 7", bloco: "3", disponivel: false, equipamentos: [{ nome: "cabo vga", existe: true }, { nome: "cabo hdmi", existe: true }, { nome: "ar-condicionado", existe: true }, { nome: "projetor", existe: true }] }
-        ]
-    )
+    const [salas, setSalas] = useState([])
+    const [blocos, setBlocos] = useState([])
     const [modalCreateSala, setModalCreateSala] = useState(false)
     const { admin } = useContext(ContextoGambiarra)
     const [searchDateItems, setSearchDateItems] = useState(
         {
             period:
                 { name: '', value: '' },
-            bloco: '', 
+            bloco: '',
             date: ''
         }
     )
@@ -37,7 +29,51 @@ const Home = () => {
         <option value={1530}>CD / Tarde</option>,
     ])
 
-    useEffect(() => { handleDate() }, [])
+    useEffect(() => {
+        initComponents()
+        handleDate()
+    }, [])
+
+    const handleCreateSala = (event) => {
+        event.preventDefault()
+
+        const nome = document.querySelector("#name").value
+        const bloco = document.querySelector("#bloco.ativo").getAttribute("data-bloco-id")
+        const capacidade = Number(document.querySelector("#capacity").value)
+        const checked_materiais = document.querySelectorAll("input[type=checkbox]")
+
+        let materiais = []
+
+        for (let material of checked_materiais) {
+            materiais.push({ nome: material.value, status: material.checked })
+        }
+
+
+        axios.post("http://localhost:3002/salas/criar", { nome, bloco, disponivel: true, capacidade, materiais, periodos: [] }).then((response) => {
+            closeModalCreateSala()
+            initComponents()
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+
+    const initComponents = async () => {
+        try {
+            let blocos = await axios.get("http://localhost:3002/blocos/listar")
+            let salas = await axios.get(`http://localhost:3002/salas/listar/${blocos.data[0]._id}`)
+            setBlocos(blocos.data)
+            setSalas(salas.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const getSalasByBloco = () => {
+        let buttonAtivo = document.querySelector(".blocos button.ativo")
+        axios.get(`http://localhost:3002/salas/listar/${buttonAtivo.getAttribute('data-bloco-id')}`).then((response) => {
+            setSalas(response.data)
+        }).catch((error) => { console.log(error) })
+    }
 
     const openModalCreateSala = () => {
         setModalCreateSala(true)
@@ -71,7 +107,7 @@ const Home = () => {
             <ModalBody isOpen={modalCreateSala}>
                 <ModalHeader title={"Adicionar sala"} onClose={closeModalCreateSala} />
                 <ModalSection>
-                    <form action="">
+                    <form onSubmit={handleCreateSala}>
                         <div className="d-flex flex-column w-100 flex-md-row justify-content-between gap-4 ">
                             <div className="input_group">
                                 <label for=" name">Nome da sala</label>
@@ -80,27 +116,47 @@ const Home = () => {
                             <div className="input_group w-auto">
                                 <label for=" name">Bloco</label>
                                 <div className="blocos d-flex gap-3">
-                                    <button onClick={toogleButtonColor} className="ativo">B1</button>
-                                    <button onClick={toogleButtonColor}>B2</button>
-                                    <button onClick={toogleButtonColor}>B3</button>
-                                    <button onClick={toogleButtonColor}>B4</button>
+                                    {blocos.map((bloco, index) => {
+                                        if (index === 0) {
+                                            return (
+                                                <button type="submit" onClick={toogleButtonColor} className="ativo" id="bloco" data-bloco-id={bloco._id}>B{bloco.numero}</button>
+                                            )
+                                        }
+
+                                        return (
+                                            <button type="submit" onClick={toogleButtonColor} id="bloco" data-bloco-id={bloco._id}>B{bloco.numero}</button>
+                                        )
+
+                                    })}
                                 </div>
                             </div>
                         </div>
                         <div className="input_group">
+                            <label for=" name">Capacidade</label>
+                            <input className="textfield" type="number" name="capacity" id="capacity" />
+                        </div>
+                        <div className="input_group">
                             <label>Materiais disponíveis</label>
                             <div className="d-flex flex-column flex-md-row gap-2 border">
-                                {salas[0].equipamentos.map((equipamento) => {
-                                    return (
-                                        <div>
-                                            <input type="checkbox" id={equipamento.nome} name={equipamento.nome} />
-                                            <label for={equipamento.nome} className="text-capitalize">{equipamento.nome}</label>
-                                        </div>
-                                    )
-                                })}
+                                <div>
+                                    <input type="checkbox" id="projetor" name="projetor" value="Projetor" />
+                                    <label for="projetor " className="text-capitalize">Projetor</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="cabo_vga" name="cabo_vga" value="Cabo VGA" />
+                                    <label for="cabo_vga" className="text-capitalize">Cabo VGA</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="cabo_hdmi" name="cabo_hdmi" value="Cabo HDMI" />
+                                    <label for="cabo_hdmi" className="text-capitalize">Cabo HDMI</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="ar_condicionado" name="ar_condicionado" value="Ar-Condicionado" />
+                                    <label for="ar_condicionado" className="text-capitalize">Ar-Condicionado</label>
+                                </div>
                             </div>
                         </div>
-                        <button className="green">Criar sala</button>
+                        <button type="submit" className="green">Criar sala</button>
                     </form>
                 </ModalSection>
             </ModalBody>
@@ -158,6 +214,7 @@ const Home = () => {
         event.preventDefault()
 
         handleDate()
+        getSalasByBloco()
 
         const data_pesquisada = document.querySelector("#data_pesquisada").value
         let period = document.querySelector(".period").selectedOptions[0]
@@ -182,10 +239,19 @@ const Home = () => {
                 <section className="filters d-flex flex-column gap-4">
                     <form className="w-100 d-flex justify-content-start" action="#" method="get" onChange={handleSearchClassrooms}>
                         <div className="blocos d-flex gap-4">
-                            <button type="submit" onClick={toogleButtonColor} className="ativo">B1</button>
-                            <button type="submit" onClick={toogleButtonColor}>B2</button>
-                            <button type="submit" onClick={toogleButtonColor}>B3</button>
-                            <button type="submit" onClick={toogleButtonColor}>B4</button>
+                            {blocos.map((bloco, index) => {
+                                if (index === 0) {
+                                    return (
+                                        <button type="submit" onClick={toogleButtonColor} className="ativo" data-bloco-id={bloco._id}>B{bloco.numero}</button>
+                                    )
+                                }
+
+                                return (
+                                    <button type="submit" onClick={toogleButtonColor} data-bloco-id={bloco._id}>B{bloco.numero}</button>
+                                )
+
+                            })}
+
                         </div>
                         <div className="d-flex gap-4">
                             <div className="flex-grou">
@@ -212,9 +278,10 @@ const Home = () => {
                     </div>
                     <div className="d-flex flex-column gap-4">
                         {
+
                             salas.map((sala) => {
                                 return (
-                                    <Sala nome={sala.nome} bloco={sala.bloco} disponivel={sala.disponivel} equipamentos={sala.equipamentos} date={searchDateItems.date} period={searchDateItems.period} />
+                                    <Sala sala={sala} date={searchDateItems.date} period={searchDateItems.period} />
                                 )
                             })
                         }
