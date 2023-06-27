@@ -26,6 +26,7 @@ const Sala = ({ sala, period, date }) => {
         try {
             let blocos = await axios.get("http://localhost:3002/blocos/listar")
             setBlocos(blocos.data)
+            console.log("essa é a reserva da sala", sala.disponivel)
         } catch (error) {
             console.log(error)
         }
@@ -301,7 +302,7 @@ const Sala = ({ sala, period, date }) => {
         console.log(nome, bloco, capacidade, materiais)
 
 
-        axios.put(`http://localhost:3002/salas/atualizar/${sala._id}`, { nome, bloco, disponivel: true, capacidade, materiais, periodos: [] }).then((response) => {
+        axios.put(`http://localhost:3002/salas/atualizar/${sala._id}`, { nome, bloco, capacidade, reservas: [], materiais }).then((response) => {
             closeModalEditSala()
         }).catch((error) => {
             console.log(error)

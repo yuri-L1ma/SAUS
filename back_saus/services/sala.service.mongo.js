@@ -6,12 +6,23 @@ const MaterialModel = require('../models/reservation_system/material.models.mong
 class SalaService {
     static listar(req, res) {
         //BlocoModel.find().populate('salas')
-        SalaModel.find()
-        .populate('bloco')
-        .populate('materiais')
-        .populate('periodos')
+        let bloco = req.params.bloco
+        SalaModel.find({ bloco })
+            .populate('bloco')
+            .populate('materiais')
             .then(
-                (salas) => {
+                (salasDB) => {
+                    let disponivelSala
+                    const salas = salasDB.map((sala) => {
+                        sala.disponivel.then((disponivel) => {
+                            disponivelSala = disponivel
+                        })
+                        console.log("SALA.DISPONVEL "+disponivelSala)
+                        return {
+                            ...sala.toJSON(),
+                            disponivel: disponivelSala
+                        }
+                    })
                     res.status(200).json(salas)
                 }
             )
@@ -29,14 +40,14 @@ class SalaService {
                         req.body.bloco,
                         { $push: { salas: sala._id } },
                         { new: true }
-                    )   .populate('salas')
+                    ).populate('salas')
                         .then(
                             (bloco) => {
                                 res.status(201).json(bloco)
                             }
                         )
                         .catch(err => res.status(500).json(err))
-                //res.status(201).json(sala)
+                    //res.status(201).json(sala)
                 }
             )
             .catch(err => res.status(500).json(err))

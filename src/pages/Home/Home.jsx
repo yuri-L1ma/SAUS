@@ -49,7 +49,7 @@ const Home = () => {
         }
 
 
-        axios.post("http://localhost:3002/salas/criar", { nome, bloco, disponivel: true, capacidade, materiais, periodos: [] }).then((response) => {
+        axios.post("http://localhost:3002/salas/criar", { nome, bloco, capacidade, reservas: [], materiais}).then((response) => {
             closeModalCreateSala()
             initComponents()
         }).catch((error) => {
