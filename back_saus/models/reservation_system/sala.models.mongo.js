@@ -13,17 +13,6 @@ var SalaSchema = new mongoose.Schema(
     { toJSON: { virtuals: true } }
 )
 
-SalaSchema.virtual('disponivel').get(
-    async function () {
-        if (this.reservas.length > 0) {
-            let sala = await this.populate('reservas')
-            console.log(sala.reservas)
-            return sala.reservas
-        } else {
-            return false
-        }
-    })
-
 
 var SalaModel = mongoose.model('salas', SalaSchema)
 
