@@ -9,13 +9,15 @@ class SalaService {
     static async listar(req, res) {
         //BlocoModel.find().populate('salas')
         let bloco = req.params.bloco
+        let dia = req.params.dia
+        let hora = parseInt(req.params.hora)
+
         SalaModel.find({ bloco }).populate('bloco').populate('materiais').then(async (salasDB) => {
-            const dia = moment().format('dddd').toLowerCase()
-            const hora = date.getHours()
             const salas = await Promise.all(salasDB.map(async (sala) => {
                 return {
                     ...sala.toJSON(),
-                    disponivel: await this.isDisponivel(sala, new Date())
+                    reservas: await this.getReservaFuncionante(sala, {dia, hora}),
+                    disponivel: await this.isDisponivel(sala, { dia, hora })
                 }
             }))
             res.status(200).json(salas)
@@ -81,23 +83,46 @@ class SalaService {
     }
 
     static async isDisponivel(sala, data) {
-        try{
-            let reservas = await ReservaModel.find({ _id: { $in: sala.reservas } }).populate({path: 'periodo', populate: 'turno'})
-            reservas = reservas.filter(reserva => reserva.ativa)
-            for(reserva of reservas){
-                if(reserva.periodo.dias.include(data.dia)){
-                    if(data.hora >= reserva.periodo.turno.comeco && data.hora <= reserva.periodo.turno.fim){
-                        return true
-                    }else{
+        try {
+            let reservas = await ReservaModel.find({ _id: { $in: sala.reservas } }).populate({ path: 'periodo', populate: 'turno' })
+            reservas = reservas.filter(reserva => reserva.ativa === true)
+            for (let reserva of reservas) {
+                console.log(reserva.periodo.dias)
+                if (reserva.periodo.dias.includes(data.dia)) {
+                    if (data.hora >= reserva.periodo.turno.comeco && data.hora <= reserva.periodo.turno.fim) {
                         return false
+                    } else {
+                        return true
                     }
-                }else{
-                    return false
+                } else {
+                    return true
                 }
             }
-            return false
-        }catch{
-            return false
+            return true
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    static async getReservaFuncionante(sala, data) {
+        try {
+            let reservas = await ReservaModel.find({ _id: { $in: sala.reservas } }).populate({ path: 'periodo', populate: 'turno' })
+            reservas = reservas.filter(reserva => reserva.ativa === true)
+            for (let reserva of reservas) {
+                console.log(reserva.periodo.dias)
+                if (reserva.periodo.dias.includes(data.dia)) {
+                    if (data.hora >= reserva.periodo.turno.comeco && data.hora <= reserva.periodo.turno.fim) {
+                        return reserva
+                    } else {
+                        return null
+                    }
+                } else {
+                    return null
+                }
+            }
+            return null
+        } catch (err) {
+            console.log(err)
         }
     }
 }

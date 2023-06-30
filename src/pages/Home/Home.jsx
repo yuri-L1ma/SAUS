@@ -60,7 +60,7 @@ const Home = () => {
     const initComponents = async () => {
         try {
             let blocos = await axios.get("http://localhost:3002/blocos/listar")
-            let salas = await axios.get(`http://localhost:3002/salas/listar/${blocos.data[0]._id}`)
+            let salas = await axios.get(`http://localhost:3002/salas/listar/${blocos.data[0]._id}/${moment().format('DD MM YYYY')}/${moment().format("HH:mm").replace(":", "")}`)
             setBlocos(blocos.data)
             setSalas(salas.data)
         } catch (error) {
@@ -70,7 +70,7 @@ const Home = () => {
 
     const getSalasByBloco = () => {
         let buttonAtivo = document.querySelector(".blocos button.ativo")
-        axios.get(`http://localhost:3002/salas/listar/${buttonAtivo.getAttribute('data-bloco-id')}`).then((response) => {
+        axios.get(`http://localhost:3002/salas/listar/${buttonAtivo.getAttribute('data-bloco-id')}/${searchDateItems.date}/${searchDateItems.period.value}`).then((response) => {
             setSalas(response.data)
         }).catch((error) => { console.log(error) })
     }
@@ -214,21 +214,20 @@ const Home = () => {
         event.preventDefault()
 
         handleDate()
-        getSalasByBloco()
-
+        
         const data_pesquisada = document.querySelector("#data_pesquisada").value
         let period = document.querySelector(".period").selectedOptions[0]
         const bloco = document.querySelector(".blocos .ativo").textContent
-
-        searchDateItems.date = data_pesquisada // talvez dê erro
+        
         searchDateItems.period = { name: period.textContent, value: period.value }
-        searchDateItems.date = moment(data_pesquisada).format("YYYY-MM-DD")
+        searchDateItems.date = moment(data_pesquisada).format("DD MM YYYY")
         searchDateItems.bloco = bloco
-
+        
         setSearchDateItems(searchDateItems)
+        getSalasByBloco()
 
 
-        // alert(`Data pesquisada: ${data_pesquisada} \n Período: ${period.value}\n Bloco: ${bloco}`)
+        // alert(`Data pesquisada: ${searchDateItems.date} \n Período: ${period.value}\n Bloco: ${bloco}`)
     }
 
     return (

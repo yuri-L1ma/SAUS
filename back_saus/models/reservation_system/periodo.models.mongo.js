@@ -2,7 +2,7 @@ var mongoose = require('mongoose')
 
 var PeriodoSchema = new mongoose.Schema(
     {
-        dias: [{ type: Date, required: true }],
+        dias: [{ type: String, required: true }],
         turno: { type: mongoose.Schema.Types.ObjectId, ref: 'turnos', required: true }, 
     }
 )

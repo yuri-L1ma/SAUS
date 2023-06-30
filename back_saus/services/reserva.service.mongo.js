@@ -47,6 +47,16 @@ class ReservaService {
             )
             .catch(err => res.status(500).json(err))
     }
+
+    static remover(req, res) {
+        ReservaModel.findByIdAndRemove(req.params.id)
+            .then(
+                (reserva) => {
+                    res.status(200).json(reserva)
+                }
+            )
+            .catch(err => res.status(500).json(err))
+    }
 }
 
 module.exports = ReservaService;

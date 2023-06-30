@@ -236,12 +236,13 @@ const Sala = ({ sala, period, date }) => {
                         <div className="d-flex justify-content-between w-100">
                             <div className="input_group">
                                 <label for="activity">Atividade</label>
-                                <select name="activity" id="activity" disabled="true">
+                                <input type="text" className="textfield" value={sala.reservas.atividade}/>
+                                {/* <select name="activity" id="activity" disabled="true">
                                     <option value="Estudar com amigos">Estudar com amigos</option>
                                     <option value="Descansar" selected>Descansar depois de um dia chato</option>
                                     <option value="Sei lá mano">Sei lá mano</option>
                                     <option value="Fofocar">Fofocar</option>
-                                </select>
+                                </select> */}
                             </div>
                             <div className="input_group align-items-end">
                                 <label for="people">Nº de pessoas</label>
@@ -250,7 +251,7 @@ const Sala = ({ sala, period, date }) => {
                         </div>
                         <div className="input_group">
                             <label for="justification">Justificativa</label>
-                            <textarea name="justification" id="justification" value={"Cansei vetes"} cols="30" rows="10" readOnly></textarea>
+                            <textarea name="justification" id="justification" value={sala.reservas.justificativa} cols="30" rows="10" readOnly></textarea>
                         </div>
                         <button className="red w-auto">Desabilitar reserva</button>
                     </form>

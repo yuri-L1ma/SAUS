@@ -3,7 +3,7 @@ var router = express.Router();
 var salaServiceMongo = require("../services/sala.service.mongo")
 
 
-router.get("/listar/:bloco", (req, res, next) => {
+router.get("/listar/:bloco/:dia/:hora", (req, res, next) => {
         salaServiceMongo.listar(req, res)
 })
 
