@@ -11,28 +11,28 @@ import axios from "axios";
 const Home = () => {
     const [salas, setSalas] = useState([])
     const [blocos, setBlocos] = useState([])
+    const [turnos, setTurnos] = useState([])
     const [modalCreateSala, setModalCreateSala] = useState(false)
     const { admin } = useContext(ContextoGambiarra)
-    const [searchDateItems, setSearchDateItems] = useState(
-        {
-            period:
-                { name: '', value: '' },
-            bloco: '',
-            date: ''
-        }
-    )
-    const [optionsSelect, setOptionsSelect] = useState([
-        <option value={800}>AB / Manhã</option>,
-        <option value={1000}>CD / Manhã</option>,
-        <option value={1200}>Almoço</option>,
-        <option value={1330}>AB / Tarde</option>,
-        <option value={1530}>CD / Tarde</option>,
-    ])
+    const [searchDateItems, setSearchDateItems] = useState({period: 0, date: '', bloco: ''})
+    const [optionsSelect, setOptionsSelect] = useState([])
 
     useEffect(() => {
         initComponents()
-        handleDate()
     }, [])
+
+    useEffect(() => {
+        getSalas()
+    }, [searchDateItems])
+
+    useEffect(() => {
+        const periodForm = document.querySelector(".period");
+      
+        if (periodForm && periodForm.selectedOptions.length > 0) {
+          const periodValue = periodForm.selectedOptions[0].value;
+          setSearchDateItems({...searchDateItems, period: periodValue});
+        }
+      }, [optionsSelect]);
 
     const handleCreateSala = (event) => {
         event.preventDefault()
@@ -48,8 +48,7 @@ const Home = () => {
             materiais.push({ nome: material.value, status: material.checked })
         }
 
-
-        axios.post("http://localhost:3002/salas/criar", { nome, bloco, capacidade, reservas: [], materiais}).then((response) => {
+        axios.post("http://localhost:3002/salas/criar", { nome, bloco, capacidade, reservas: [], materiais }).then((response) => {
             closeModalCreateSala()
             initComponents()
         }).catch((error) => {
@@ -59,20 +58,42 @@ const Home = () => {
 
     const initComponents = async () => {
         try {
-            let blocos = await axios.get("http://localhost:3002/blocos/listar")
-            let salas = await axios.get(`http://localhost:3002/salas/listar/${blocos.data[0]._id}/${moment().format('DD MM YYYY')}/${moment().format("HH:mm").replace(":", "")}`)
-            setBlocos(blocos.data)
-            setSalas(salas.data)
+            let blocosDB = await axios.get("http://localhost:3002/blocos/listar")
+            let turnosDB = await axios.get("http://localhost:3002/turnos/listar")
+            let salasDB = await axios.get(`http://localhost:3002/salas/listar/${blocosDB.data[0]._id}/${moment().format('DD MM YYYY')}/${moment().format("HH:mm").replace(":", "")}`)
+            let turnosQuantity = turnosDB.data.length
+
+            turnosDB.data.sort((a, b) => a.comeco - b.comeco)
+
+            setBlocos(blocosDB.data)
+            setTurnos(turnosDB.data)
+            setSalas(salasDB.data)
+
+            //Pegando turnos do Banco e colocando no select com base na hora do sistema
+            setOptionsSelect(
+                turnosDB.data.map((turno, index) => {
+                    let hora = parseInt(moment().format("HH:mm").replace(":", ""))
+                    if (turno.fim >= hora) {
+                        return <option value={turno.comeco}>{turno.nome}</option>
+                    } else if (index === (turnosQuantity - 1)) {
+                        if (hora > turno.fim) {
+                            return <option value={0}>Indisponível para reservas</option>
+                        }
+                    }
+                }))
+
         } catch (error) {
             console.log(error)
         }
     }
 
-    const getSalasByBloco = () => {
-        let buttonAtivo = document.querySelector(".blocos button.ativo")
-        axios.get(`http://localhost:3002/salas/listar/${buttonAtivo.getAttribute('data-bloco-id')}/${searchDateItems.date}/${searchDateItems.period.value}`).then((response) => {
-            setSalas(response.data)
-        }).catch((error) => { console.log(error) })
+    const getSalas = async () => {
+        try {
+            let salasDB = await axios.get(`http://localhost:3002/salas/listar/${searchDateItems.bloco}/${searchDateItems.date}/${searchDateItems.period}`)
+            setSalas(salasDB.data)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const openModalCreateSala = () => {
@@ -164,70 +185,58 @@ const Home = () => {
     }
 
     const handleDate = () => {
-        const selectedDate = document.querySelector("#data_pesquisada")
-        const exactHour = parseInt(moment().format("HH:mm").replace(":", ""))
-        // const exactHour = 2300
-        const periods = [
-            { start: 800, end: 959 },
-            { start: 1000, end: 1159 },
-            { start: 1200, end: 1329 },
-            { start: 1330, end: 1529 },
-            { start: 1530, end: 1730 }
-        ]
-        let newOptionsSelect = []
+        let dataAtual = moment().format("DD MM YYYY")
+        let dataSelecionada = moment(document.querySelector("#data_pesquisada").value).format("DD MM YYYY")
+        let horaAtual = parseInt(moment().format("HH:mm").replace(":", ""))
 
-        if (selectedDate.value !== moment().format("YYYY-MM-DD")) {
-            newOptionsSelect = [
-                <option value={800}>AB / Manhã</option>,
-                <option value={1000}>CD / Manhã</option>,
-                <option value={1200}>Almoço</option>,
-                <option value={1330}>AB / Tarde</option>,
-                <option value={1530}>CD / Tarde</option>
-            ]
+        if (dataAtual !== dataSelecionada) {
+            setOptionsSelect(turnos.map((turno, index) => {
+                if (index === 0) {
+                    return <option value={turno.comeco} selected>{turno.nome}</option>
+                } else {
+                    return <option value={turno.comeco}>{turno.nome}</option>
+                }
+            }))
         } else {
-            newOptionsSelect = optionsSelect.filter((option) => {
-                for (let period of periods) {
-                    if (exactHour >= period.start) {
-                        if (exactHour <= period.end && option.props.value >= period.start) {
-                            return option
-                        }
+            setOptionsSelect(turnos.map((turno, index) => {
+                if (turno.fim >= horaAtual) {
+                    if(index === 0){
+                        return <option value={turno.comeco} selected>{turno.nome}</option>
+                    }else{
+                        return <option value={turno.comeco}>{turno.nome}</option>
+                    }
+                } else if (index === (turnos.length - 1)) {
+                    if (horaAtual > turno.fim) {
+                        return <option value={0}>Indisponível para reservas</option>
                     }
                 }
-                return null
-            })
+            }))
         }
-
-        if (newOptionsSelect.length === 0) {
-            newOptionsSelect = [
-                <option value={0}>Indisponível para reservas</option>
-            ]
-        }
-
-        searchDateItems.period = { name: newOptionsSelect[0].props.children, value: newOptionsSelect[0].props.value }
-        searchDateItems.date = moment(selectedDate.value).format("YYYY-MM-DD")
-
-        setOptionsSelect(newOptionsSelect)
-        setSearchDateItems(searchDateItems)
     }
+
+    const updateItems = () => {
+        let dateForm = moment(document.querySelector("#data_pesquisada").value).format("DD MM YYYY")
+        let blocoForm = document.querySelector(".blocos .ativo").getAttribute('data-bloco-id')
+        let periodForm = document.querySelector(".period").selectedOptions[0].value
+        
+        setSearchDateItems({ date: dateForm, bloco: blocoForm, period: periodForm } )
+    }
+
 
     const handleSearchClassrooms = (event) => {
         event.preventDefault()
 
         handleDate()
-        
-        const data_pesquisada = document.querySelector("#data_pesquisada").value
-        let period = document.querySelector(".period").selectedOptions[0]
-        const bloco = document.querySelector(".blocos .ativo").textContent
-        
-        searchDateItems.period = { name: period.textContent, value: period.value }
-        searchDateItems.date = moment(data_pesquisada).format("DD MM YYYY")
-        searchDateItems.bloco = bloco
-        
-        setSearchDateItems(searchDateItems)
-        getSalasByBloco()
 
+        updateItems()
 
-        // alert(`Data pesquisada: ${searchDateItems.date} \n Período: ${period.value}\n Bloco: ${bloco}`)
+        // try {
+        //     console.log("OS ITENS", searchDateItems)
+        //     let salasDB = await axios.get(`http://localhost:3002/salas/listar/${searchDateItems.bloco}/${searchDateItems.date}/${searchDateItems.period}`)
+        //     setSalas(salasDB.data)
+        // } catch (error) {
+        //     console.log(error)
+        // }
     }
 
     return (

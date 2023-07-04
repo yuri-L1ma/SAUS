@@ -12,6 +12,8 @@ class SalaService {
         let dia = req.params.dia
         let hora = parseInt(req.params.hora)
 
+        console.log(bloco, dia, hora)
+
         SalaModel.find({ bloco }).populate('bloco').populate('materiais').then(async (salasDB) => {
             const salas = await Promise.all(salasDB.map(async (sala) => {
                 return {
@@ -85,20 +87,16 @@ class SalaService {
     static async isDisponivel(sala, data) {
         try {
             let reservas = await ReservaModel.find({ _id: { $in: sala.reservas } }).populate({ path: 'periodo', populate: 'turno' })
+            let response = true
             reservas = reservas.filter(reserva => reserva.ativa === true)
             for (let reserva of reservas) {
-                console.log(reserva.periodo.dias)
                 if (reserva.periodo.dias.includes(data.dia)) {
                     if (data.hora >= reserva.periodo.turno.comeco && data.hora <= reserva.periodo.turno.fim) {
-                        return false
-                    } else {
-                        return true
+                        response = false
                     }
-                } else {
-                    return true
                 }
             }
-            return true
+            return response
         } catch (err) {
             console.log(err)
         }
@@ -109,18 +107,12 @@ class SalaService {
             let reservas = await ReservaModel.find({ _id: { $in: sala.reservas } }).populate({ path: 'periodo', populate: 'turno' })
             reservas = reservas.filter(reserva => reserva.ativa === true)
             for (let reserva of reservas) {
-                console.log(reserva.periodo.dias)
                 if (reserva.periodo.dias.includes(data.dia)) {
                     if (data.hora >= reserva.periodo.turno.comeco && data.hora <= reserva.periodo.turno.fim) {
                         return reserva
-                    } else {
-                        return null
                     }
-                } else {
-                    return null
                 }
             }
-            return null
         } catch (err) {
             console.log(err)
         }
