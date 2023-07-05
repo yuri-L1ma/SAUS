@@ -1,30 +1,31 @@
 var express = require('express');
-//var session = require('express-session')
-
 var router = express.Router();
-var loginService = require("../services/login.service")
+const LoginService = require("../services/login.service.mongo")
 
-//var salas = require("./routes/salas")
+// VERSÃO GAMBIARRA
+// var loginService = require("../services/login.service")
 
-// router.get(
-//     "/"
+
+// router.post(
+//     "/login"
 //     ,
 //     (req, res, next) => {
-//         res.send("Hello World")
+//         const usuario = loginService.Logar(req.body)
+//         res.json(usuario)
+
+//         if (usuario === "Usuário não está cadastrado!") {
+//             res.status(401).json({ message: 'Usuário não está cadastrado!' })
+//         }
 //     }
 // )
 
+//VERSÃO COM MONGOOSE --- Colocar abaixo daqui
 
 router.post(
-    "/login"
-    ,
+    "/login",
     (req, res, next) => {
-        const usuario = loginService.Logar(req.body)
-        res.json(usuario)
-
-        if (usuario === "Usuário não está cadastrado!") {
-            res.status(401).json({ message: 'Usuário não está cadastrado!' })
-        }
+        console.log(req.body)
+        LoginService.Logar(req.body, res)
     }
 )
 
