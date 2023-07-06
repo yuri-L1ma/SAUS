@@ -1,14 +1,14 @@
 var express = require('express');
 var router = express.Router();
-var periodoServiceMongo = require("../services/periodo.service.mongo")
+var diasServiceMongo = require("../services/dias.service.mongo")
 
 
 router.get("/listar", (req, res, next) => {
-    periodoServiceMongo.listar(req, res)
+    diasServiceMongo.listar(req, res)
 })
 
 router.post("/criar", (req, res, next) => {
-    periodoServiceMongo.criar(req, res)
+    diasServiceMongo.criar(req, res)
 })
 
 

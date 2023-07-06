@@ -10,7 +10,6 @@ var SalaSchema = new mongoose.Schema(
         reservas: [{ type: mongoose.Schema.Types.ObjectId, ref: 'reservas', required: false }],
         materiais: [MaterialModel.schema],
     },
-    { toJSON: { virtuals: true } }
 )
 
 

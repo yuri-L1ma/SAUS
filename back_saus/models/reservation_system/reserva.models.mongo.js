@@ -9,7 +9,7 @@ var ReservaSchema = new mongoose.Schema(
         //solicitante: { type: mongoose.Schema.Types.ObjectId, ref: 'alunos', required: true },
         qtdAlunos: { type: Number, required: true, min: 3, max: 60 },
         ativa: { type: Boolean, required: true },
-        periodo: { type: mongoose.Schema.Types.ObjectId, ref: 'periodos', required: true },
+        dias: [{ type: mongoose.Schema.Types.ObjectId, ref: 'dias', required: true }],
         //queixas: [{ type: mongoose.Schema.Types.ObjectId, ref: 'queixas', required: false }]
     }
 )

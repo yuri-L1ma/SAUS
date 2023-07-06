@@ -5,7 +5,6 @@ var TurnoSchema = new mongoose.Schema(
         nome: { type: String, required: true },
         comeco: { type: Number, required: true },
         fim: { type: Number, required: true }
-
     }
 )
 

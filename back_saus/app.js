@@ -10,7 +10,7 @@ var login = require("./routes/login")
 var alunos = require("./routes/alunos")
 var blocos = require("./routes/blocos")
 var turnos = require("./routes/turnos")
-var periodos = require("./routes/periodos")
+var dias = require("./routes/dias")
 var reservas = require("./routes/reservas")
 
 var app = express();
@@ -31,7 +31,7 @@ app.use("/", login)
 app.use("/alunos/", alunos)
 app.use("/blocos/", blocos)
 app.use("/turnos/", turnos)
-app.use("/periodos/", periodos)
+app.use("/dias/", dias)
 app.use("/reservas/", reservas)
 
 

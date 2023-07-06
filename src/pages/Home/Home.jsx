@@ -12,9 +12,10 @@ const Home = () => {
     const [salas, setSalas] = useState([])
     const [blocos, setBlocos] = useState([])
     const [turnos, setTurnos] = useState([])
+    const [reservavel, setReservavel] = useState(true)
     const [modalCreateSala, setModalCreateSala] = useState(false)
     const { admin } = useContext(ContextoGambiarra)
-    const [searchDateItems, setSearchDateItems] = useState({period: 0, date: '', bloco: ''})
+    const [searchDateItems, setSearchDateItems] = useState({ turno: { init_value: 0, name: '', id: '' }, date: '', bloco: '' })
     const [optionsSelect, setOptionsSelect] = useState([])
 
     useEffect(() => {
@@ -23,16 +24,30 @@ const Home = () => {
 
     useEffect(() => {
         getSalas()
+
+        if (moment(searchDateItems.date).day() === 6 || moment(searchDateItems.date).day() === 0) {
+            setReservavel(false)
+        } else {
+            setReservavel(true)
+        }
+
     }, [searchDateItems])
 
     useEffect(() => {
-        const periodForm = document.querySelector(".period");
-      
-        if (periodForm && periodForm.selectedOptions.length > 0) {
-          const periodValue = periodForm.selectedOptions[0].value;
-          setSearchDateItems({...searchDateItems, period: periodValue});
+        const turnoForm = document.querySelector(".turno");
+
+        if (turnoForm && turnoForm.selectedOptions.length > 0) {
+            let turnoFormValue = document.querySelector(".turno").selectedOptions[0].value
+            let turnoFormName = document.querySelector(".turno").selectedOptions[0].text
+            let turnoFormID = document.querySelector(".turno").selectedOptions[0].getAttribute("data-turno-id")
+
+            setSearchDateItems({ ...searchDateItems, turno: { init_value: turnoFormValue, name: turnoFormName, id: turnoFormID } })
+
+            if (turnoForm.selectedOptions[0].value === "0") {
+                setReservavel(false)
+            }
         }
-      }, [optionsSelect]);
+    }, [optionsSelect]);
 
     const handleCreateSala = (event) => {
         event.preventDefault()
@@ -60,7 +75,7 @@ const Home = () => {
         try {
             let blocosDB = await axios.get("http://localhost:3002/blocos/listar")
             let turnosDB = await axios.get("http://localhost:3002/turnos/listar")
-            let salasDB = await axios.get(`http://localhost:3002/salas/listar/${blocosDB.data[0]._id}/${moment().format('DD MM YYYY')}/${moment().format("HH:mm").replace(":", "")}`)
+            let salasDB = await axios.get(`http://localhost:3002/salas/listar/${blocosDB.data[0]._id}/${moment().format('YYYY-MM-DD')}/${moment().format("HH:mm").replace(":", "")}`)
             let turnosQuantity = turnosDB.data.length
 
             turnosDB.data.sort((a, b) => a.comeco - b.comeco)
@@ -74,7 +89,7 @@ const Home = () => {
                 turnosDB.data.map((turno, index) => {
                     let hora = parseInt(moment().format("HH:mm").replace(":", ""))
                     if (turno.fim >= hora) {
-                        return <option value={turno.comeco}>{turno.nome}</option>
+                        return <option value={turno.comeco} data-turno-id={turno._id}>{turno.nome}</option>
                     } else if (index === (turnosQuantity - 1)) {
                         if (hora > turno.fim) {
                             return <option value={0}>Indisponível para reservas</option>
@@ -89,7 +104,7 @@ const Home = () => {
 
     const getSalas = async () => {
         try {
-            let salasDB = await axios.get(`http://localhost:3002/salas/listar/${searchDateItems.bloco}/${searchDateItems.date}/${searchDateItems.period}`)
+            let salasDB = await axios.get(`http://localhost:3002/salas/listar/${searchDateItems.bloco}/${searchDateItems.date}/${searchDateItems.turno.init_value}`)
             setSalas(salasDB.data)
         } catch (error) {
             console.log(error)
@@ -185,25 +200,26 @@ const Home = () => {
     }
 
     const handleDate = () => {
-        let dataAtual = moment().format("DD MM YYYY")
-        let dataSelecionada = moment(document.querySelector("#data_pesquisada").value).format("DD MM YYYY")
+        let dataAtual = moment().format("YYYY-MM-DD")
+        let dataSelecionada = document.querySelector("#data_pesquisada").value
         let horaAtual = parseInt(moment().format("HH:mm").replace(":", ""))
+
 
         if (dataAtual !== dataSelecionada) {
             setOptionsSelect(turnos.map((turno, index) => {
                 if (index === 0) {
-                    return <option value={turno.comeco} selected>{turno.nome}</option>
+                    return <option value={turno.comeco} data-turno-id={turno._id} selected>{turno.nome}</option>
                 } else {
-                    return <option value={turno.comeco}>{turno.nome}</option>
+                    return <option value={turno.comeco} data-turno-id={turno._id}>{turno.nome}</option>
                 }
             }))
         } else {
             setOptionsSelect(turnos.map((turno, index) => {
                 if (turno.fim >= horaAtual) {
-                    if(index === 0){
-                        return <option value={turno.comeco} selected>{turno.nome}</option>
-                    }else{
-                        return <option value={turno.comeco}>{turno.nome}</option>
+                    if (index === 0) {
+                        return <option value={turno.comeco} data-turno-id={turno._id} selected>{turno.nome}</option>
+                    } else {
+                        return <option value={turno.comeco} data-turno-id={turno._id}>{turno.nome}</option>
                     }
                 } else if (index === (turnos.length - 1)) {
                     if (horaAtual > turno.fim) {
@@ -215,13 +231,14 @@ const Home = () => {
     }
 
     const updateItems = () => {
-        let dateForm = moment(document.querySelector("#data_pesquisada").value).format("DD MM YYYY")
+        let dateForm = document.querySelector("#data_pesquisada").value
         let blocoForm = document.querySelector(".blocos .ativo").getAttribute('data-bloco-id')
-        let periodForm = document.querySelector(".period").selectedOptions[0].value
-        
-        setSearchDateItems({ date: dateForm, bloco: blocoForm, period: periodForm } )
-    }
+        let turnoFormValue = document.querySelector(".turno").selectedOptions[0].value
+        let turnoFormName = document.querySelector(".turno").selectedOptions[0].text
+        let turnoFormID = document.querySelector(".turno").selectedOptions[0].getAttribute("data-turno-id")
 
+        setSearchDateItems({ date: dateForm, bloco: blocoForm, turno: { init_value: turnoFormValue, name: turnoFormName, id: turnoFormID } })
+    }
 
     const handleSearchClassrooms = (event) => {
         event.preventDefault()
@@ -229,14 +246,6 @@ const Home = () => {
         handleDate()
 
         updateItems()
-
-        // try {
-        //     console.log("OS ITENS", searchDateItems)
-        //     let salasDB = await axios.get(`http://localhost:3002/salas/listar/${searchDateItems.bloco}/${searchDateItems.date}/${searchDateItems.period}`)
-        //     setSalas(salasDB.data)
-        // } catch (error) {
-        //     console.log(error)
-        // }
     }
 
     return (
@@ -266,7 +275,7 @@ const Home = () => {
                                 <input className="textfield" type="date" name="data_pesquisada" id="data_pesquisada" min={moment().format("YYYY-MM-DD")} defaultValue={moment().format("YYYY-MM-DD")} />
                             </div>
                             <div className="flex-grow-1">
-                                <select className="period w-100" name="period" id="period">
+                                <select className="turno w-100" name="turno" id="turno">
                                     {optionsSelect}
                                 </select>
                             </div>
@@ -289,7 +298,7 @@ const Home = () => {
 
                             salas.map((sala) => {
                                 return (
-                                    <Sala sala={sala} date={searchDateItems.date} period={searchDateItems.period} />
+                                    <Sala sala={sala} date={{ day: document.querySelector("#data_pesquisada").value, turno: { name: searchDateItems.turno.name, init_value: searchDateItems.turno.init_value, id: searchDateItems.turno.id } }} reservavel={reservavel} updateSalas = {initComponents} />
                                 )
                             })
                         }

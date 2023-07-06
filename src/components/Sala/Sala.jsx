@@ -9,12 +9,15 @@ import { ModalBody, ModalHeader, ModalSection } from "../Modal/Modal";
 import moment from "moment/moment";
 import axios from "axios";
 
-const Sala = ({ sala, period, date }) => {
+const Sala = ({ sala, date, reservavel, updateSalas }) => {
     const [modalQueixa, setModalQueixa] = useState(false);
     const [modalReserva, setModalReserva] = useState(false);
     const [modalFeedback, setModalFeedback] = useState(false);
     const [modalEditSala, setModalEditSala] = useState(false);
     const [blocos, setBlocos] = useState([])
+    const [turnos, setTurnos] = useState([])
+    const [optionsSelect, setOptionsSelect] = useState([])
+
     const [materiais, setMateriais] = useState(sala.materiais)
     const { admin } = useContext(ContextoGambiarra)
 
@@ -24,9 +27,27 @@ const Sala = ({ sala, period, date }) => {
 
     const initComponents = async () => {
         try {
-            let blocos = await axios.get("http://localhost:3002/blocos/listar")
-            setBlocos(blocos.data)
-            console.log("essa é a reserva da sala", sala.disponivel)
+            let blocosDB = await axios.get("http://localhost:3002/blocos/listar")
+            let turnosDB = await axios.get("http://localhost:3002/turnos/listar")
+            let turnosQuantity = turnosDB.data.length
+
+            turnosDB.data.sort((a, b) => a.comeco - b.comeco)
+
+            setBlocos(blocosDB.data)
+            setTurnos(turnosDB.data)
+
+            console.log(reservavel)
+            setOptionsSelect(
+                turnosDB.data.map((turno, index) => {
+                    let hora = parseInt(moment().format("HH:mm").replace(":", ""))
+                    if (turno.fim >= hora) {
+                        return <option value={turno.comeco}>{turno.nome}</option>
+                    } else if (index === (turnosQuantity - 1)) {
+                        if (hora > turno.fim) {
+                            return <option value={0}>Indisponível para reservas</option>
+                        }
+                    }
+                }))
         } catch (error) {
             console.log(error)
         }
@@ -34,7 +55,6 @@ const Sala = ({ sala, period, date }) => {
 
     const toggleActiveClassroom = (sala_componente) => {
         sala_componente.parentElement.classList.toggle("ativo")
-        console.log(period, date)
     }
 
     const toogleButtonColor = (event) => {
@@ -98,12 +118,35 @@ const Sala = ({ sala, period, date }) => {
         setMateriais(sala.materiais)
     };
 
+    const handleCreateReserva = (event) => {
+        event.preventDefault()
+
+        const turno = document.querySelector("#alunoturno").getAttribute("data-id-turno")
+        const init_date = document.querySelector("#init_date").value
+        const activity = document.querySelector("#activity").value
+        const quantity_people = document.querySelector("#quantity_people").value
+        const justification = document.querySelector("#justification").value
+        const sala_id = sala._id
+
+        alert(`${turno} ${init_date} ${activity} ${quantity_people} ${justification}`)
+
+        axios.post("http://localhost:3002/dias/criar", { dia: init_date, turnos: [turno] }).then((dias) => {
+            axios.post("http://localhost:3002/reservas/criar", { atividade: activity, justificativa: justification, sala: sala_id, qtdAlunos: quantity_people, ativa: true, dias: dias.data._id }).then((response) => {
+                closeModalReserva()
+                updateSalas()
+                // initComponents()
+            }).catch((error) => {
+                console.log(error.response.data)
+            })
+        }).catch((error) => { alert(error) })
+    }
+
     const configureFormsReserva = () => {
         if (sala.disponivel) {
             if (admin) {
                 return (
-                    <form action="">
-                        <div className="d-flex flex-column flex-md-row w-100 gap-3">
+                    <form onSubmit={handleCreateReserva}>
+                        {/* <div className="d-flex flex-column flex-md-row w-100 gap-3">
                             <div className="input_group">
                                 <label for="full_name">Nome completo</label>
                                 <input className="textfield" placeholder="Nome completo" type="text" name="full_name" id="full_name" />
@@ -112,15 +155,12 @@ const Sala = ({ sala, period, date }) => {
                                 <label for="registration">Matrícula</label>
                                 <input className="textfield" placeholder="Matrícula" type="text" name="registration" id="registration" />
                             </div>
-                        </div>
+                        </div> */}
                         <div className="d-flex flex-column flex-md-row w-100 gap-3">
                             <div className="input_group">
-                                <label for="period">Período</label>
-                                <select name="period" id="period">
-                                    <option value="AB1">AB | MANHÃ</option>
-                                    <option value="CD1">CD | MANHÃ</option>
-                                    <option value="AB2">AB | TARDE</option>
-                                    <option value="CD2">CD | TARDE</option>
+                                <label for="adminturno">Turno</label>
+                                <select className="turnos w-100" name="adminturno" id="adminturno">
+                                    {optionsSelect}
                                 </select>
                             </div>
                             <div className="input_group">
@@ -135,16 +175,11 @@ const Sala = ({ sala, period, date }) => {
                         <div className="d-flex justify-content-between w-100">
                             <div className="input_group">
                                 <label for="activity">Atividade</label>
-                                <select className="w-100" name="activity" id="activity">
-                                    <option value="Estudar com amigos">Estudar com amigos</option>
-                                    <option value="Descansar">Descansar depois de um dia chato</option>
-                                    <option value="Sei lá mano">Sei lá mano</option>
-                                    <option value="Fofocar">Fofocar</option>
-                                </select>
-                            </div>
+                                <input className="textfield" type="text" name="activity" id="activity" placeholder="Qual a atividade da reserva?" />
+                            </div>  
                             <div className="input_group align-items-end">
-                                <label for="people">Nº de pessoas</label>
-                                <input className="textfield w-50" placeholder="Nº" type="number" name="people" id="people" />
+                                <label for="quantity_people">Nº de pessoas</label>
+                                <input className="textfield w-75" placeholder="Nº" type="number" name="quantity_people" id="quantity_people" />
                             </div>
                         </div>
                         <div className="input_group">
@@ -156,8 +191,8 @@ const Sala = ({ sala, period, date }) => {
                 )
             } else {
                 return (
-                    <form action="">
-                        <div className="d-flex flex-column flex-md-row w-100 gap-3">
+                    <form onSubmit={handleCreateReserva}>
+                        {/* <div className="d-flex flex-column flex-md-row w-100 gap-3">
                             <div className="input_group">
                                 <label for="full_name">Nome completo</label>
                                 <input className="textfield" placeholder="Nome completo" type="text" name="full_name" id="full_name" />
@@ -166,37 +201,32 @@ const Sala = ({ sala, period, date }) => {
                                 <label for="registration">Matrícula</label>
                                 <input className="textfield" placeholder="Matrícula" type="text" name="registration" id="registration" />
                             </div>
-                        </div>
+                        </div> */}
                         <div className="d-flex flex-column flex-md-row w-100 gap-3">
                             <div className="input_group">
-                                <label for="period">Período</label>
-                                <input className="textfield" type="text" value={period.name} readOnly />
+                                <label for="turno">Turno</label>
+                                <input className="textfield" type="text" value={date.turno.name} data-id-turno={date.turno.id} name="alunoturno" id="alunoturno" readOnly />
                             </div>
                             <div className="input_group">
                                 <label for="init_date">Data</label>
-                                <input className="textfield" type="date" name="init_date" value={date} readOnly id="init_date" />
+                                <input className="textfield" type="date" name="init_date" value={date.day} readOnly id="init_date" />
                             </div>
                         </div>
                         <div className="d-flex justify-content-between w-100">
                             <div className="input_group">
                                 <label for="activity">Atividade</label>
-                                <select className="w-100" name="activity" id="activity">
-                                    <option value="Estudar com amigos">Estudar com amigos</option>
-                                    <option value="Descansar">Descansar depois de um dia chato</option>
-                                    <option value="Sei lá mano">Sei lá mano</option>
-                                    <option value="Fofocar">Fofocar</option>
-                                </select>
+                                <input className="textfield" type="text" name="activity" id="activity" placeholder="Qual a atividade da reserva?" />
                             </div>
                             <div className="input_group align-items-end">
-                                <label for="people">Nº de pessoas</label>
-                                <input className="textfield w-75" placeholder="Nº" type="number" name="people" id="people" />
+                                <label for="quantity_people">Nº de pessoas</label>
+                                <input className="textfield w-75" placeholder="Nº" type="number" name="quantity_people" id="quantity_people" />
                             </div>
                         </div>
                         <div className="input_group">
                             <label for="justification">Justificativa</label>
                             <textarea name="justification" id="justification" cols="30" rows="10"></textarea>
                         </div>
-                        <button className="green">Reservar</button>
+                        <button type="submit" className="green">Reservar</button>
                     </form>
                 )
             }
@@ -236,7 +266,7 @@ const Sala = ({ sala, period, date }) => {
                         <div className="d-flex justify-content-between w-100">
                             <div className="input_group">
                                 <label for="activity">Atividade</label>
-                                <input type="text" className="textfield" value={sala.reservas.atividade}/>
+                                <input type="text" className="textfield" value={sala.reservas.atividade} />
                                 {/* <select name="activity" id="activity" disabled="true">
                                     <option value="Estudar com amigos">Estudar com amigos</option>
                                     <option value="Descansar" selected>Descansar depois de um dia chato</option>
@@ -305,6 +335,7 @@ const Sala = ({ sala, period, date }) => {
 
         axios.put(`http://localhost:3002/salas/atualizar/${sala._id}`, { nome, bloco, capacidade, reservas: [], materiais }).then((response) => {
             closeModalEditSala()
+            updateSalas()
         }).catch((error) => {
             console.log(error)
         })
@@ -352,7 +383,7 @@ const Sala = ({ sala, period, date }) => {
                         </div>
                         <div className="input_group">
                             <label for=" name">Capacidade</label>
-                            <input className="textfield" type="number" name="capacity" id="capacity" defaultValue={sala.capacidade}/>
+                            <input className="textfield" type="number" name="capacity" id="capacity" defaultValue={sala.capacidade} />
                         </div>
                         <div className="input_group">
                             <label>Materiais disponíveis</label>
@@ -429,13 +460,19 @@ const Sala = ({ sala, period, date }) => {
                             <img src={ar_icon} alt="" />
                         </span>
                     </div>
-                    <h1 className={sala.disponivel ? "disponivel" : "indisponivel"}>{sala.disponivel ? "disponivel" : "reservado"}</h1>
-                    {sala.disponivel ?
-                        <button className="green" onClick={openModalReserva}>Fazer Reserva</button>
-                        : admin ?
-                            <button className="red" onClick={openModalReserva}>Ver reserva</button>
-                            :
-                            <button className="red" onClick={openModalQueixa}>Fazer Queixa</button>
+                    {reservavel ?
+                        <>
+                            <h1 className={sala.disponivel ? "disponivel" : "indisponivel"}>{sala.disponivel ? "disponivel" : "reservado"}</h1>
+                            {sala.disponivel ?
+                                <button className="green" onClick={openModalReserva}>Fazer Reserva</button>
+                                : admin ?
+                                    <button className="red" onClick={openModalReserva}>Ver reserva</button>
+                                    :
+                                    <button className="red" onClick={openModalQueixa}>Fazer Queixa</button>
+                            }
+                        </>
+                        :
+                        <h1 className="indisponivelParaReservas">Indisponível para reservas</h1>
                     }
                 </header>
                 <aside>

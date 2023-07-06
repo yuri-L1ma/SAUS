@@ -42,6 +42,13 @@
     text-transform: capitalize;
 }
 
+.sala header h1.indisponivelParaReservas {
+    color: #767676;
+    font-size: 1.1rem;
+    text-transform: capitalize;
+    padding: 1rem 1rem;
+}
+
 .sala aside {
     display: flex;
     flex-direction: column;
