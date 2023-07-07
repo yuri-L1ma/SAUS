@@ -2,12 +2,17 @@ import "./Sala.css"
 import { useState, useEffect } from "react";
 import projetor_icon from "../../assets/icons/projetor.svg"
 import ar_icon from "../../assets/icons/ar.svg"
-import { Edit2Icon } from "lucide-react";
+import { Edit2Icon, PlusCircle, Trash } from "lucide-react";
 import { useContext } from "react"
 import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
 import { ModalBody, ModalHeader, ModalSection } from "../Modal/Modal";
 import moment from "moment/moment";
+import 'moment/locale/pt'
 import axios from "axios";
+import React from "react";
+import ReactDOM from "react-dom";
+
+moment.locale('pt')
 
 const Sala = ({ sala, date, reservavel, updateSalas }) => {
     const [modalQueixa, setModalQueixa] = useState(false);
@@ -16,15 +21,28 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
     const [modalEditSala, setModalEditSala] = useState(false);
     const [blocos, setBlocos] = useState([])
     const [turnos, setTurnos] = useState([])
-    const [optionsSelect, setOptionsSelect] = useState([])
-
+    const [turnosSelect, setTurnosSelect] = useState([])
+    const [contentTurnos, setContentTurnos] = useState([])
+    const [days, setDays] = useState([date.day])
     const [materiais, setMateriais] = useState(sala.materiais)
+
     const { admin } = useContext(ContextoGambiarra)
 
     useEffect(() => {
         initComponents()
     }, [])
 
+    useEffect(() => {
+        setDays([date.day])
+    }, [date.day])
+
+    // useEffect(() => {
+    //     handleContentTurnos(<TurnoElement turno={turnos[0]}/>)
+    // }, [turnosSelect])
+
+    const handleContentTurnos = (turnoElement) => {
+        setContentTurnos((prevContentTurnos) => [...prevContentTurnos, turnoElement]);
+    }
     const initComponents = async () => {
         try {
             let blocosDB = await axios.get("http://localhost:3002/blocos/listar")
@@ -36,16 +54,11 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
             setBlocos(blocosDB.data)
             setTurnos(turnosDB.data)
 
-            console.log(reservavel)
-            setOptionsSelect(
+            setTurnosSelect(
                 turnosDB.data.map((turno, index) => {
                     let hora = parseInt(moment().format("HH:mm").replace(":", ""))
                     if (turno.fim >= hora) {
-                        return <option value={turno.comeco}>{turno.nome}</option>
-                    } else if (index === (turnosQuantity - 1)) {
-                        if (hora > turno.fim) {
-                            return <option value={0}>Indisponível para reservas</option>
-                        }
+                        return <button type="button" onClick={() => handleContentTurnos(<TurnoElement turno={turno}/>)} class="dropdown-item" data-turno={turno}>{turno.nome}</button>
                     }
                 }))
         } catch (error) {
@@ -99,6 +112,7 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
 
     const closeModalReserva = () => {
         setModalReserva(false);
+        setDays([date.day])
     };
 
     const openModalFeedback = () => {
@@ -141,6 +155,36 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
         }).catch((error) => { alert(error) })
     }
 
+    const handlePeriod = (event) => {
+        event.preventDefault()
+
+        const day = parseInt(document.querySelector("#day").value);
+
+        const init_date = moment(document.querySelector("#init_date").value).startOf('day');
+        const end_date = moment(document.querySelector("#end_date").value).startOf('day');
+
+        const date_calc = init_date;
+        const days_selected = [];
+
+        if (day === 7) {
+            while (date_calc.isSameOrBefore(end_date)) {
+                if (date_calc.day() !== 0 && date_calc.day() !== 6) {
+                    days_selected.push(date_calc.format("YYYY-MM-DD"))
+                }
+                date_calc.add(1, 'days');
+            }
+        } else {
+            while (date_calc.isSameOrBefore(end_date)) {
+                if (date_calc.day() === day) {
+                    days_selected.push(date_calc.format("YYYY-MM-DD"))
+                }
+
+                date_calc.add(1, 'days');
+            }
+        }
+        setDays(days_selected)
+    }
+
     const configureFormsReserva = () => {
         if (sala.disponivel) {
             if (admin) {
@@ -156,27 +200,58 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
                                 <input className="textfield" placeholder="Matrícula" type="text" name="registration" id="registration" />
                             </div>
                         </div> */}
-                        <div className="d-flex flex-column flex-md-row w-100 gap-3">
-                            <div className="input_group">
-                                <label for="adminturno">Turno</label>
-                                <select className="turnos w-100" name="adminturno" id="adminturno">
-                                    {optionsSelect}
-                                </select>
+                        <div className="d-flex flex-column w-100 gap-3" onChange={handlePeriod}>
+                            <div className="d-flex flex-column flex-md-row gap-3">
+                                <div className="input_group">
+                                    <label for="day">Peridiocidade</label>
+                                    <select className="day w-100" name="day" id="day">
+                                        <option value="1">Segunda-feira</option>
+                                        <option value="2">Terça-feira</option>
+                                        <option value="3">Quarta-feira</option>
+                                        <option value="4">Quinta-feira</option>
+                                        <option value="5">Sexta-feira</option>
+                                        <option value="6">Sábado</option>
+                                        <option value="0">Domingo</option>
+                                        <option value="7" selected>Sem peridiocidade</option>
+                                    </select>
+                                </div>
+                                <div className="input_group">
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <label for="turno">Turno(s)</label>
+                                    </div>
+                                    <div className="content-turnos d-flex flex-wrap flex-md-nowrap gap-3">
+                                        {contentTurnos}
+                                        <div className="dropdown">
+                                            <button className="adicionar outlined text-nowrap d-flex align-items-center gap-3 w-100" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <PlusCircle size={22} />
+                                                <span>Adicionar turno</span>
+                                            </button>
+                                            <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                {turnosSelect}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="input_group">
-                                <label for="init_date">Data inicial</label>
-                                <input className="textfield" type="date" name="init_date" value={moment().format("YYYY-MM-DD")} readOnly id="init_date" />
+                            <div className="d-flex flex-md-row gap-3">
+                                <div className="input_group">
+                                    <label for="init_date">Data inicial</label>
+                                    <input className="textfield" type="date" name="init_date" defaultValue={date.day} min={moment().format("YYYY-MM-DD")} id="init_date" />
+                                </div>
+                                <div className="input_group">
+                                    <label for="end_date">Data final</label>
+                                    <input className="textfield" type="date" name="end_date" defaultValue={date.day} min={moment().format("YYYY-MM-DD")} id="end_date" />
+                                </div>
                             </div>
-                            <div className="input_group">
-                                <label for="end_date">Data final</label>
-                                <input className="textfield" type="date" name="end_date" id="end_date" />
-                            </div>
+                        </div>
+                        <div className="d-flex flex-wrap flex-grow gap-3">
+                            {days.map((day) => <div className="p-3 border border-primary rounded">{moment(day).format("dddd, DD [de] MMMM")}</div>)}
                         </div>
                         <div className="d-flex justify-content-between w-100">
                             <div className="input_group">
                                 <label for="activity">Atividade</label>
                                 <input className="textfield" type="text" name="activity" id="activity" placeholder="Qual a atividade da reserva?" />
-                            </div>  
+                            </div>
                             <div className="input_group align-items-end">
                                 <label for="quantity_people">Nº de pessoas</label>
                                 <input className="textfield w-75" placeholder="Nº" type="number" name="quantity_people" id="quantity_people" />
@@ -514,6 +589,23 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
             {configureModalFeedback()}
             {configureModalEditSala()}
             {qualModal()}
+        </>
+    )
+}
+
+const removeContentTurno = () => {
+
+}
+
+const TurnoElement = ({ turno }) => {
+    return (
+        <>
+            <div class="turno-element d-flex align-items-center justify-content-between ps-3 gap-2 flex-grow-1">
+                <span className="text-nowrap">{turno.nome}</span>
+                <button type="button" class="rounded-button" data-turno-id="${turno._id}" onClick={removeContentTurno}>
+                    <Trash size={18}/>
+                </button>
+            </div>
         </>
     )
 }

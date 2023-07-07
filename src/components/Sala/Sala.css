@@ -20,7 +20,7 @@
     cursor: pointer;
 }
 
-.sala header > button{
+.sala header>button {
     display: none;
 }
 
@@ -82,18 +82,32 @@
     background: #2376D7;
 }
 
-.sala.ativo header> div h1, .sala.ativo header > h1, .sala.ativo header > div .rounded-button svg, .sala.ativo header div.icons span img{
+.sala.ativo header>div h1,
+.sala.ativo header>h1,
+.sala.ativo header>div .rounded-button svg,
+.sala.ativo header div.icons span img {
     color: white;
     stroke: white;
     filter: brightness(0) invert(1);
 }
 
+.turno-element {
+    height: 3.125rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button.adicionar{
+    height: 3.125rem;
+}
+
 @media screen and (min-width: 768px) {
-    .sala header{
+    .sala header {
         padding: 1rem;
     }
 
-    .sala header > button{
+    .sala header>button {
         display: block;
     }
 

@@ -26,25 +26,25 @@ const Home = () => {
         getSalas()
 
         if (moment(searchDateItems.date).day() === 6 || moment(searchDateItems.date).day() === 0) {
+            // setOptionsSelect([<option value={0}>Indisponível para reservas</option>])
             setReservavel(false)
-        } else {
-            setReservavel(true)
         }
-
     }, [searchDateItems])
 
     useEffect(() => {
         const turnoForm = document.querySelector(".turno");
 
         if (turnoForm && turnoForm.selectedOptions.length > 0) {
-            let turnoFormValue = document.querySelector(".turno").selectedOptions[0].value
-            let turnoFormName = document.querySelector(".turno").selectedOptions[0].text
-            let turnoFormID = document.querySelector(".turno").selectedOptions[0].getAttribute("data-turno-id")
+            let turnoFormValue = turnoForm.selectedOptions[0].value
+            let turnoFormName = turnoForm.selectedOptions[0].text
+            let turnoFormID = turnoForm.selectedOptions[0].getAttribute("data-turno-id")
 
             setSearchDateItems({ ...searchDateItems, turno: { init_value: turnoFormValue, name: turnoFormName, id: turnoFormID } })
 
-            if (turnoForm.selectedOptions[0].value === "0") {
+            if (turnoFormValue == 0) {
                 setReservavel(false)
+            }else{
+                setReservavel(true)
             }
         }
     }, [optionsSelect]);
@@ -92,7 +92,7 @@ const Home = () => {
                         return <option value={turno.comeco} data-turno-id={turno._id}>{turno.nome}</option>
                     } else if (index === (turnosQuantity - 1)) {
                         if (hora > turno.fim) {
-                            return <option value={0}>Indisponível para reservas</option>
+                            return <option value={0}>Indisponível para reservas nesse horário</option>
                         }
                     }
                 }))
@@ -202,6 +202,7 @@ const Home = () => {
     const handleDate = () => {
         let dataAtual = moment().format("YYYY-MM-DD")
         let dataSelecionada = document.querySelector("#data_pesquisada").value
+        let dayOfWeek = moment(dataSelecionada).day()
         let horaAtual = parseInt(moment().format("HH:mm").replace(":", ""))
 
 
@@ -223,10 +224,14 @@ const Home = () => {
                     }
                 } else if (index === (turnos.length - 1)) {
                     if (horaAtual > turno.fim) {
-                        return <option value={0}>Indisponível para reservas</option>
+                        return <option value={0}>Indisponível para reservas nesse horário</option>
                     }
                 }
             }))
+        }
+        
+        if(dayOfWeek === 6 || dayOfWeek === 0){
+            setOptionsSelect([<option value={0}>Indisponível para reservas aos fins de semana</option>])
         }
     }
 
