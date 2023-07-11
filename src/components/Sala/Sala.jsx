@@ -22,8 +22,8 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
     const [blocos, setBlocos] = useState([])
     const [turnos, setTurnos] = useState([])
     const [turnosSelect, setTurnosSelect] = useState([])
-    const [contentTurnos, setContentTurnos] = useState([])
-    const [days, setDays] = useState([date.day])
+    const [turnosSelected, setTurnosSelected] = useState([])
+    const [daysSelected, setDaysSelected] = useState([])
     const [materiais, setMateriais] = useState(sala.materiais)
 
     const { admin } = useContext(ContextoGambiarra)
@@ -33,16 +33,50 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
     }, [])
 
     useEffect(() => {
-        setDays([date.day])
-    }, [date.day])
+        if (daysSelected.length > 0) {
+            console.log(daysSelected)
+            hasReserva(daysSelected)
+        }
+    }, [daysSelected])
 
-    // useEffect(() => {
-    //     handleContentTurnos(<TurnoElement turno={turnos[0]}/>)
-    // }, [turnosSelect])
+    useEffect(() => {
+        if(daysSelected.length > 0) {
+            setDaysSelected([])
+            for (let day of daysSelected) {
+                let diaAdicionado = { dia: day.dia, turnos: turnosSelected }
+                setDaysSelected(prevDaysSelected => [...prevDaysSelected, diaAdicionado])
+            }
+        }
+    }, [turnosSelected])
 
-    const handleContentTurnos = (turnoElement) => {
-        setContentTurnos((prevContentTurnos) => [...prevContentTurnos, turnoElement]);
+
+    const hasReserva = async (dias) => {
+        try {
+            let reserva = await axios.post(`http://localhost:3002/salas/hasReserva`, { dias, sala: sala._id })
+            if (reserva) {
+                let dias = reserva.data.dias
+                let turnos = dias.map((dia) => dia.turnos)
+                console.log(dias, turnos)
+                // alert(`SALA INDISPONÍVEL \n`)
+                setDaysSelected([])
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
+
+    const handleTurnosSelected = (turno) => {
+        setTurnosSelected((prevTurnosSelected) => {
+            if (prevTurnosSelected.some((item) => item._id === turno._id)) {
+                alert("Turno já adicionado")
+            } else {
+                return [...prevTurnosSelected, turno];
+            }
+
+            return prevTurnosSelected;
+        });
+    }
+
     const initComponents = async () => {
         try {
             let blocosDB = await axios.get("http://localhost:3002/blocos/listar")
@@ -53,17 +87,48 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
 
             setBlocos(blocosDB.data)
             setTurnos(turnosDB.data)
+            setTurnosSelect([])
 
-            setTurnosSelect(
-                turnosDB.data.map((turno, index) => {
+            turnosDB.data.forEach(
+                (turno, index) => {
                     let hora = parseInt(moment().format("HH:mm").replace(":", ""))
                     if (turno.fim >= hora) {
-                        return <button type="button" onClick={() => handleContentTurnos(<TurnoElement turno={turno}/>)} class="dropdown-item" data-turno={turno}>{turno.nome}</button>
+                        setTurnosSelect((prevTurnosSelected) => [...prevTurnosSelected, turno])
+                    } else if (index === (turnosQuantity - 1)) {
+                        if (hora > turno.fim) {
+                            setTurnosSelect([])
+                        }
                     }
-                }))
+                }
+            )
+
         } catch (error) {
             console.log(error)
         }
+    }
+
+    const handleDate = () => {
+        let dataAtual = moment().format("YYYY-MM-DD")
+        let dataSelecionada = document.querySelector("#init_date").value
+        let horaAtual = parseInt(moment().format("HH:mm").replace(":", ""))
+
+
+        if (dataAtual !== dataSelecionada) {
+            setTurnosSelect(turnos.map((turno) => {
+                return turno
+            }))
+        } else {
+            setTurnosSelect(turnos.map((turno, index) => {
+                if (turno.fim >= horaAtual) {
+                    return turno
+                } else if (index === (turnos.length - 1)) {
+                    if (horaAtual > turno.fim) {
+                        return null
+                    }
+                }
+            }))
+        }
+
     }
 
     const toggleActiveClassroom = (sala_componente) => {
@@ -97,7 +162,6 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
         setMateriais(materiais)
     }
 
-
     const openModalQueixa = () => {
         setModalQueixa(true);
     };
@@ -112,7 +176,7 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
 
     const closeModalReserva = () => {
         setModalReserva(false);
-        setDays([date.day])
+        setDaysSelected([])
     };
 
     const openModalFeedback = () => {
@@ -135,54 +199,85 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
     const handleCreateReserva = (event) => {
         event.preventDefault()
 
-        const turno = document.querySelector("#alunoturno").getAttribute("data-id-turno")
+        
         const init_date = document.querySelector("#init_date").value
+        const end_date = document.querySelector("#end_date")
         const activity = document.querySelector("#activity").value
         const quantity_people = document.querySelector("#quantity_people").value
         const justification = document.querySelector("#justification").value
         const sala_id = sala._id
 
-        alert(`${turno} ${init_date} ${activity} ${quantity_people} ${justification}`)
+        // alert(`${turno} ${init_date} ${activity} ${quantity_people} ${justification}`)
 
-        axios.post("http://localhost:3002/dias/criar", { dia: init_date, turnos: [turno] }).then((dias) => {
-            axios.post("http://localhost:3002/reservas/criar", { atividade: activity, justificativa: justification, sala: sala_id, qtdAlunos: quantity_people, ativa: true, dias: dias.data._id }).then((response) => {
-                closeModalReserva()
-                updateSalas()
-                // initComponents()
-            }).catch((error) => {
-                console.log(error.response.data)
-            })
-        }).catch((error) => { alert(error) })
+        if(end_date){
+            axios.post("http://localhost:3002/dias/criar", { dias: daysSelected }).then((dias) => {
+                let idDias = dias.data.map((dia) => dia._id)
+                axios.post("http://localhost:3002/reservas/criar", { atividade: activity, justificativa: justification, sala: sala_id, qtdAlunos: quantity_people, ativa: true, dias: idDias }).then((response) => {
+                    closeModalReserva()
+                    updateSalas()
+                    // initComponents()
+                }).catch((error) => {
+                    console.log(error.response.data)
+                })
+            }).catch((error) => { alert(error) })
+        }else{
+            const turno = document.querySelector("#alunoturno").getAttribute("data-id-turno")
+            axios.post("http://localhost:3002/dias/criar", { dias: {dia: init_date, turnos: [turno]} }).then((dias) => {
+                let idDias = dias.data.map((dia) => dia._id)
+                axios.post("http://localhost:3002/reservas/criar", { atividade: activity, justificativa: justification, sala: sala_id, qtdAlunos: quantity_people, ativa: true, dias: idDias }).then((response) => {
+                    closeModalReserva()
+                    updateSalas()
+                    // initComponents()
+                }).catch((error) => {
+                    console.log(error.response.data)
+                })
+            }).catch((error) => { alert(error) })
+        }
+
     }
 
     const handlePeriod = (event) => {
         event.preventDefault()
+
+        handleDate()
+
+        setDaysSelected([])
+
 
         const day = parseInt(document.querySelector("#day").value);
 
         const init_date = moment(document.querySelector("#init_date").value).startOf('day');
         const end_date = moment(document.querySelector("#end_date").value).startOf('day');
 
+        if (end_date.isBefore(init_date)) {
+            setDaysSelected([])
+        }
+
         const date_calc = init_date;
-        const days_selected = [];
+
 
         if (day === 7) {
             while (date_calc.isSameOrBefore(end_date)) {
                 if (date_calc.day() !== 0 && date_calc.day() !== 6) {
-                    days_selected.push(date_calc.format("YYYY-MM-DD"))
+                    let diaAdicionado = { dia: date_calc.format("YYYY-MM-DD"), turnos: turnosSelected }
+                    setDaysSelected((prevDaysSelected) =>
+                        [...prevDaysSelected, diaAdicionado]
+                    )
                 }
                 date_calc.add(1, 'days');
             }
         } else {
             while (date_calc.isSameOrBefore(end_date)) {
                 if (date_calc.day() === day) {
-                    days_selected.push(date_calc.format("YYYY-MM-DD"))
+                    let diaAdicionado = { dia: date_calc.format("YYYY-MM-DD"), turnos: turnosSelected }
+                    setDaysSelected((prevDaysSelected) =>
+                        [...prevDaysSelected, diaAdicionado]
+                    )
                 }
 
                 date_calc.add(1, 'days');
             }
         }
-        setDays(days_selected)
     }
 
     const configureFormsReserva = () => {
@@ -220,14 +315,18 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
                                         <label for="turno">Turno(s)</label>
                                     </div>
                                     <div className="content-turnos d-flex flex-wrap flex-md-nowrap gap-3">
-                                        {contentTurnos}
+                                        {turnosSelected.map((turno) => <TurnoElement turno={turno} />)}
                                         <div className="dropdown">
                                             <button className="adicionar outlined text-nowrap d-flex align-items-center gap-3 w-100" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <PlusCircle size={22} />
                                                 <span>Adicionar turno</span>
                                             </button>
                                             <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                {turnosSelect}
+                                                {turnosSelect.map((turno) => {
+                                                    if (turno) {
+                                                        return <button type="button" onClick={() => handleTurnosSelected(turno)} class="dropdown-item">{turno.nome}</button>
+                                                    }
+                                                })}
                                             </div>
                                         </div>
                                     </div>
@@ -244,8 +343,8 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="d-flex flex-wrap flex-grow gap-3">
-                            {days.map((day) => <div className="p-3 border border-primary rounded">{moment(day).format("dddd, DD [de] MMMM")}</div>)}
+                        <div className="d-flex flex-wrap w-100 gap-3">
+                            {daysSelected.map((day) => <DayElement day={day} />)}
                         </div>
                         <div className="d-flex justify-content-between w-100">
                             <div className="input_group">
@@ -341,7 +440,7 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
                         <div className="d-flex justify-content-between w-100">
                             <div className="input_group">
                                 <label for="activity">Atividade</label>
-                                <input type="text" className="textfield" value={sala.reservas.atividade} />
+                                <input type="text" className="textfield" value={sala.reserva.atividade} />
                                 {/* <select name="activity" id="activity" disabled="true">
                                     <option value="Estudar com amigos">Estudar com amigos</option>
                                     <option value="Descansar" selected>Descansar depois de um dia chato</option>
@@ -356,7 +455,7 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
                         </div>
                         <div className="input_group">
                             <label for="justification">Justificativa</label>
-                            <textarea name="justification" id="justification" value={sala.reservas.justificativa} cols="30" rows="10" readOnly></textarea>
+                            <textarea name="justification" id="justification" value={sala.reserva.justificativa} cols="30" rows="10" readOnly></textarea>
                         </div>
                         <button className="red w-auto">Desabilitar reserva</button>
                     </form>
@@ -515,6 +614,36 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
         }
     }
 
+    const removeContentTurno = (id) => {
+        setTurnosSelected((prevTurnosSelected) => {
+            return prevTurnosSelected.filter((turno) => turno._id !== id)
+        })
+    }
+
+    const TurnoElement = ({ turno }) => {
+        return (
+            <>
+                <div class="turno-element d-flex align-items-center justify-content-between ps-3 gap-2 flex-grow-1" data-turno-id={turno._id}>
+                    <span className="text-nowrap">{turno.nome}</span>
+                    <button type="button" class="rounded-button" data-turno-id="${turno._id}" onClick={() => removeContentTurno(turno._id)}>
+                        <Trash size={18} />
+                    </button>
+                </div>
+            </>
+        )
+    }
+
+    const DayElement = ({ day }) => {
+        return (
+            <div className="d-flex flex-grow-1 gap-3 flex-column p-3 border border-secondary rounded">
+                <span>{moment(day.dia).format("dddd, DD [de] MMMM")}</span>
+                <div className="d-flex gap-3 flex-wrap">
+                    {turnosSelected.map((turno) => <TurnoElement turno={turno} />)}
+                </div>
+            </div>
+        )
+    }
+
     return (
         <>
             <div className="sala">
@@ -589,23 +718,6 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
             {configureModalFeedback()}
             {configureModalEditSala()}
             {qualModal()}
-        </>
-    )
-}
-
-const removeContentTurno = () => {
-
-}
-
-const TurnoElement = ({ turno }) => {
-    return (
-        <>
-            <div class="turno-element d-flex align-items-center justify-content-between ps-3 gap-2 flex-grow-1">
-                <span className="text-nowrap">{turno.nome}</span>
-                <button type="button" class="rounded-button" data-turno-id="${turno._id}" onClick={removeContentTurno}>
-                    <Trash size={18}/>
-                </button>
-            </div>
         </>
     )
 }

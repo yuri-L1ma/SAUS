@@ -14,7 +14,10 @@ class DiasService {
 
 
     static criar(req, res) {
-        DiasModel.create(req.body)
+        let dias = req.body.dias;
+        console.log(dias);
+        
+        DiasModel.insertMany(dias)
             .then(
                 (Dias) => {
                     res.status(201).json(Dias) ;

@@ -2,6 +2,7 @@ const SalaModel = require('../models/reservation_system/sala.models.mongo')
 const BlocoModel = require('../models/reservation_system/bloco.models.mongo')
 const MaterialModel = require('../models/reservation_system/material.models.mongo')
 const ReservaModel = require('../models/reservation_system/reserva.models.mongo')
+const DiasModel = require('../models/reservation_system/dias.models.mongo')
 const moment = require('moment')
 
 class SalaService {
@@ -17,7 +18,7 @@ class SalaService {
             const salas = await Promise.all(salasDB.map(async (sala) => {
                 return {
                     ...sala.toJSON(),
-                    reservas: await this.getReservaFuncionante(sala, {dia, hora}),
+                    reserva: await this.getReservaFuncionante(sala, { dia, hora }),
                     disponivel: await this.isDisponivel(sala, { dia, hora })
                 }
             }))
@@ -87,13 +88,13 @@ class SalaService {
         try {
             let reservas = await ReservaModel.find({ _id: { $in: sala.reservas } }).populate({ path: 'dias', populate: 'turnos' })
             let response = true
-            
+
             reservas = reservas.filter(reserva => reserva.ativa === true)
 
             for (let reserva of reservas) {
-                for(let dia of reserva.dias){
-                    if(dia.dia === data.dia){
-                        for(let turno of dia.turnos){
+                for (let dia of reserva.dias) {
+                    if (dia.dia === data.dia) {
+                        for (let turno of dia.turnos) {
                             if (data.hora >= turno.comeco && data.hora <= turno.fim) {
                                 response = false
                             }
@@ -108,18 +109,58 @@ class SalaService {
         }
     }
 
+    static async hasReserva(req, res) {
+        // let sala_id = req.params.id;
+        // let diaPesquisado = req.params.dia;
+        // let turnoPesquisado = req.params.turno;
+        let { sala, dias } = req.body;
+
+        console.log(dias)
+
+        try {
+            const reservas = await ReservaModel.find({ sala }).populate(
+                'dias',
+            );
+
+            const reservaEncontrada = reservas.find((r) => {
+                for (let diaPesquisado of dias) {
+                    for (let diaReserva of r.dias) {
+                        if (diaReserva.dia === diaPesquisado.dia) {
+                            for (let turnoPesquisado of diaPesquisado.turnos) {
+                                if (diaReserva.turnos.includes(turnoPesquisado._id)) {
+                                    return r
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            console.log(reservaEncontrada)
+
+            if (!reservaEncontrada) {
+                res.status(400).json({ error: 'DEU MUITO ERRADO' });
+            }
+
+            res.status(200).json(reservaEncontrada);
+        } catch (err) {
+            console.log('O ERRO FOI', err);
+            res.status(400).json({ error: 'DEU MUITO ERRADO' });
+        }
+    }
+
     static async getReservaFuncionante(sala, data) {
         try {
             let reservas = await ReservaModel.find({ _id: { $in: sala.reservas } }).populate({ path: 'dias', populate: 'turnos' })
-            
+
             reservas = reservas.filter(reserva => reserva.ativa === true)
-            
+
             let response = reservas
 
             for (let reserva of reservas) {
-                for(let dia of reserva.dias){
-                    if(dia.dia === data.dia){
-                        for(let turno of dia.turnos){
+                for (let dia of reserva.dias) {
+                    if (dia.dia === data.dia) {
+                        for (let turno of dia.turnos) {
                             if (data.hora >= turno.comeco && data.hora <= turno.fim) {
                                 response = reserva
                             }
@@ -130,7 +171,7 @@ class SalaService {
 
             return response
         } catch (err) {
-            console.log(err)    
+            console.log(err)
         }
     }
 }

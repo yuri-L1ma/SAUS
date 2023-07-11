@@ -15,6 +15,14 @@ router.get("/retrieve/:id", (req, res, next) => {
         salaServiceMongo.retrieve(req, res)
 })
 
+// router.get("/hasReserva/:id/:dia/:turno", (req, res, next) => {
+//         salaServiceMongo.hasReserva(req, res)
+// })
+
+router.post("/hasReserva/", (req, res, next) => {
+        salaServiceMongo.hasReserva(req, res)
+})
+
 router.put("/atualizar/:id", (req, res, next) => {
         salaServiceMongo.atualizar(req, res)
 })
