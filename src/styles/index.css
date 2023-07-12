@@ -67,6 +67,11 @@ button.outlined {
   font-weight: 600;
 }
 
+button.outlined:hover{
+  background: #2376D7;
+  color: white;
+}
+
 button.gambiarra {
   background: #305C90;
 }

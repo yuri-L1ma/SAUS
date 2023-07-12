@@ -26,7 +26,7 @@ router.get(
 )
 
 router.put(
-    "/atualizar/:id",
+    "/atualizar/:adm_id/:user_id",
     (req, res, next) => {
         adminService.atualizar(req, res)
     }

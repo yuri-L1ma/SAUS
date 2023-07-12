@@ -12,7 +12,7 @@ class LoginAdminService {
                 if (adminEncontrado) {
                     console.log(adminEncontrado)
                     if (adminEncontrado.user.email == email && adminEncontrado.user.senha == senha) {
-                        res.status(200).json({ "admin": true, "id": adminEncontrado._id, "nome": adminEncontrado.user.nome, "email": adminEncontrado.user.email, "senha": adminEncontrado.user.senha, "cpf": adminEncontrado.cpf, "cargo": adminEncontrado.cargo })
+                        res.status(200).json({ "admin": true, "id": adminEncontrado._id, "nome": adminEncontrado.user.nome, "user_id": adminEncontrado.user._id, "email": adminEncontrado.user.email, "senha": adminEncontrado.user.senha, "cpf": adminEncontrado.cpf, "cargo": adminEncontrado.cargo })
                     } else {
                         res.status(200).json(false)
                     }

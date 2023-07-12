@@ -66,23 +66,18 @@ const Perfil = () => {
     const handleUpdatePerfilAluno = (event) => {
         event.preventDefault()
 
-        // const nome = document.getElementById("nome").value
-        // const email = document.getElementById("email").value
-        // const senha = document.getElementById("senha").value
-        // const matricula = document.getElementById("matricula").value
-        // const curso = document.getElementById("curso").value
-        // const semestre = document.getElementById("semestre").value
-
         const usuario = { nome, email, senha }
-        //const aluno = { matricula, curso, semestre }
+        const aluno = { curso, matricula, semestre}
 
-        // console.log(nome, email, senha, matricula, curso, semestre)
+        const usuarioID = user.user_id
+        const alunoID = user.id
 
-        axios.put(`http://localhost:3002/alunos/atualizar/${user.id}`, { matricula, curso, semestre, usuario })
+        console.log(usuario, aluno)
+
+        axios.put(`http://localhost:3002/alunos/atualizar/${alunoID}/${usuarioID}`, {user: usuario, aluno: aluno})
             .then((response) => {
-                console.log(response.data)
                 alert("Perfil do " + response.data.nome + " atualizado com sucesso!")
-                //navigate("/aluno/perfil")
+                navigate("/admin/perfil")
 
             }).catch((error) => {
                 console.log(error)
@@ -93,13 +88,17 @@ const Perfil = () => {
         event.preventDefault()
 
         const usuario = { nome, email, senha }
-       // const admin = { cpf, cargo }
-        const userId = localStorage.getItem("id")
+        const adm = {cpf, cargo}
 
-        axios.put(`http://localhost:3002/admin/atualizar/${userId}`, { cpf, cargo, usuario })
+        const usuarioID = user.user_id
+        const admID = user.id
+
+        console.log(usuario, adm)
+
+        axios.put(`http://localhost:3002/admin/atualizar/${admID}/${usuarioID}`, {user: usuario, adm: adm })
             .then((response) => {
                 alert("Perfil do " + response.data.nome + " atualizado com sucesso!")
-                //navigate("/admin/perfil")
+                navigate("/admin/perfil")
 
             }).catch((error) => {
                 console.log(error)

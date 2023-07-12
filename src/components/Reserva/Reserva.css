@@ -64,9 +64,21 @@
     color: white;
 }
 
+.justificativa {
+    width: 50% !important;
+}
 
-/* @media screen and (min-width: 768px) {
-    .reserva .justificativa {
-        width: 60% !important;
+.local {
+    width: 50% !important;
+}
+
+
+@media screen and (max-width: 768px) {
+    .justificativa {
+        width: 100% !important;
     }
-} */
+
+   .local {
+        width: 100% !important;
+    }
+}

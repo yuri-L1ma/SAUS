@@ -82,7 +82,7 @@ router.get(
 )
 
 router.put(
-    "/atualizar/:id"
+    "/atualizar/:aluno_id/:user_id"
     ,
     (req, res, next) => {
         alunoService.atualizar(req, res)

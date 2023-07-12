@@ -3,14 +3,31 @@ import "./Reserva.css"
 import { XIcon, TrashIcon } from "lucide-react"
 import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
 import moment from "moment"
+import axios from "axios"
 
-const Reserva = ({ reserva }) => {
+const Reserva = ({ reserva, updateReservas }) => {
     const reservaRef = useRef(null)
     const { admin } = useContext(ContextoGambiarra)
 
     const toggleActiveReserve = (event) => {
         event.preventDefault()
+
         reservaRef.current.classList.toggle("ativo")
+    }
+
+    const handleDesativarReserva = (event) => {
+        event.preventDefault()
+
+        reservaRef.current.classList.toggle("ativo")
+
+        let dias = reserva.dias.map((dia) => dia._id)
+
+        axios.put(`http://localhost:3002/reservas/atualizar/${reserva._id}`, { ...reserva, solicitante: reserva.solicitante, dias, ativa: false }).then((response) => {
+            alert("Reserva cancelada com sucesso!")
+            updateReservas()
+        }).catch((error) => {
+            console.log(error)
+        })
     }
 
     const DayElement = ({ day }) => {
@@ -42,38 +59,36 @@ const Reserva = ({ reserva }) => {
             </header>
             <aside>
                 <section>
-                    <form action="" className="d-flex flex-column gap-3 w-100">
-                        <div className="d-flex flex-column gap-3 gap-md-5 flex-md-row">
-                            <div className="d-flex flex-column gap-3 ">
-                                <div className="d-flex gap-3 flex-column">
-                                    <div className="input_group">
-                                        <label>Local</label>
-                                        <div className="d-flex align-items-center ">
-                                            <h3 className="text-nowrap">{reserva.sala.nome}, Bloco {reserva.sala.bloco.numero}</h3>
-                                        </div>
+                    <form action="" className="d-flex flex-column gap-5 w-100">
+                        <div className="d-flex flex-column justify-content-between gap-3 flex-md-row">
+                            <div className="local d-flex gap-3 flex-column">
+                                <div className="input_group">
+                                    <label>Local</label>
+                                    <div className="d-flex align-items-center ">
+                                        <h3 className="text-nowrap">{reserva.sala.nome}, Bloco {reserva.sala.bloco.numero}</h3>
                                     </div>
-                                    <div className="input_group">
-                                        <label for="Remember" className="text-nowrap">Nº de pessoas</label>
-                                        <h3 className="text-nowrap">{reserva.qtdAlunos} pessoas</h3>
-                                    </div>
+                                </div>
+                                <div className="input_group">
+                                    <label for="Remember" className="text-nowrap">Nº de pessoas</label>
+                                    <h3 className="text-nowrap">{reserva.qtdAlunos} pessoas</h3>
                                 </div>
                             </div>
                             <div className="input_group justificativa">
                                 <label for="Remember">Justificativa</label>
                                 <textarea name="" readOnly value={reserva.justificativa}></textarea>
                             </div>
-                            <div className="input_group">
-                                <label for="Remember">Dias</label>
-                                <div className="d-flex gap-3 mh-50">
-                                    {reserva.dias.map((dia) => {
-                                        return <DayElement day={dia} />
-                                    })}
-                                </div>
+                        </div>
+                        <div className="input_group">
+                            {/* <label className="fs-3">Dias</label> */}
+                            <div className="d-flex gap-3 flex-wrap">
+                                {reserva.dias.map((dia) => {
+                                    return <DayElement day={dia} />
+                                })}
                             </div>
                         </div>
                         <div className="d-flex w-100 justify-content-between justify-content-md-end">
-                            {!admin ?
-                                <button onClick={toggleActiveReserve} className="d-flex gap-2 justify-content-around align-self-end w-auto red">
+                            {!admin && reserva.ativa ?
+                                <button onClick={handleDesativarReserva} className="d-flex gap-2 justify-content-around align-self-end w-auto red">
                                     <TrashIcon size={24} />
                                     <span>Cancelar reserva</span>
                                 </button>

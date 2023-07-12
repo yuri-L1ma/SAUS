@@ -90,6 +90,13 @@
     stroke: white;
     filter: brightness(0) invert(1);
 }
+.sala header a {
+    text-decoration: none !important;
+}
+.sala.ativo header button.outlined{
+    color: white;
+    border: 1px solid white;
+}
 
 .turno-element {
     height: 3.125rem;

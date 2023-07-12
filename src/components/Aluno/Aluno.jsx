@@ -1,10 +1,34 @@
 import { LockIcon, Maximize2Icon, TicketIcon, InboxIcon, SendIcon, ChevronDown } from "lucide-react"
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { ModalBody, ModalHeader, ModalSection } from "../Modal/Modal"
 import "./Aluno.css"
+import Reserva from "../Reserva/Reserva"
+import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
+import axios from "axios"
 
-const Aluno = ({ nome, matricula }) => {
+const Aluno = ({ aluno }) => {
     const [modalAluno, setModalAluno] = useState(false)
+    const [reservas, setReservas] = useState([])
+    const [loading, setLoading] = useState(true)
+    // const {user} = useContext(ContextoGambiarra)
+
+    useEffect(() => {
+        initComponents()
+    }, [])
+
+    const initComponents = async () => {
+        try {
+            console.log(aluno)
+            let reservas = await axios.get(`http://localhost:3002/reservas/aluno/${aluno.id}`)
+
+            let reservasOrdenadas = reservas.data.sort((a, b) => (b.ativa - a.ativa))
+
+            setReservas(reservasOrdenadas)
+            setLoading(false)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const openModalAluno = () => {
         setModalAluno(true)
@@ -22,7 +46,7 @@ const Aluno = ({ nome, matricula }) => {
     const configureModalAluno = () => {
         return (
             <ModalBody isOpen={modalAluno}>
-                <ModalHeader title={nome} subtitle={matricula} onClose={closeModalAluno} />
+                <ModalHeader title={aluno.nome} subtitle={aluno.matricula} onClose={closeModalAluno} />
                 <ModalSection>
                     <div className='d-md-none'>
                         <button className="buttonAluno w-100 my-3" type="button" onClick={toggleButtonFocus} data-toggle="collapse" data-target="#collapseReservas" aria-expanded="false" aria-controls="collapseExample">
@@ -31,12 +55,11 @@ const Aluno = ({ nome, matricula }) => {
                         </button>
                         <div className="collapse" id="collapseReservas">
                             <div className="d-flex flex-column gap-4">
-                                <h1>Reservas vão aqui</h1>
-                                {/* {
-                                    queixas.map((queixa) => {
-                                        return <Queixa motivo={queixa.motivo} data={queixa.data} />
+                                {
+                                    reservas.map((reserva) => {
+                                        return <Reserva reserva={reserva} updateReservas={initComponents} />
                                     })
-                                } */}
+                                }
                             </div>
                         </div>
                         <button className="buttonAluno w-100 my-3" onClick={toggleButtonFocus} type="button" data-toggle="collapse" data-target="#collapseQueixasEnviadas" aria-expanded="false" aria-controls="collapseExample">
@@ -113,11 +136,11 @@ const Aluno = ({ nome, matricula }) => {
                             <div className="tab-pane fade show active" id="pills-reservas" role="tabpanel" aria-labelledby="pills-reservas-tab">
                                 <div className="d-flex flex-column gap-4 mt-4">
                                     <h1>Reservas</h1>
-                                    {/* {
-                                        queixas.map((queixa) => {
-                                            return <Queixa motivo={queixa.motivo} data={queixa.data} />
+                                    {
+                                        reservas.map((reserva) => {
+                                            return <Reserva reserva={reserva} updateReservas={initComponents} />
                                         })
-                                    } */}
+                                    }
                                 </div>
                             </div>
                             <div className="tab-pane fade" id="pills-queixas-recebidas" role="tabpanel" aria-labelledby="pills-queixas-recebidas-tab">
@@ -162,8 +185,8 @@ const Aluno = ({ nome, matricula }) => {
             <div className="aluno">
                 <header className="gap-3">
                     <div className="d-flex gap-md-5 gap-2 flex-wrap w-100">
-                        <h1 className="text-nowrap">{nome}</h1>
-                        <h1>{matricula}</h1>
+                        <h1 className="text-nowrap">{aluno.nome}</h1>
+                        <h1>{aluno.matricula}</h1>
                     </div>
                     <button className="d-flex align-items-center gap-3 justify-content-center" onClick={openModalAluno}>
                         <Maximize2Icon size={20} />

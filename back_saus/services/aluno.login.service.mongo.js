@@ -41,7 +41,7 @@ class LoginService {
             if (alunoEncontrado) {
                 console.log('Aluno encontrado:', alunoEncontrado);
                 if (email == alunoEncontrado.user.email && senha == alunoEncontrado.user.senha) {
-                    res.status(200).json({"aluno": true, "id": alunoEncontrado._id, "nome": alunoEncontrado.user.nome, "email": alunoEncontrado.user.email, "senha": alunoEncontrado.user.senha, "matricula": alunoEncontrado.matricula, "curso": alunoEncontrado.curso, "semestre": alunoEncontrado.semestre})
+                    res.status(200).json({"aluno": true, "id": alunoEncontrado._id, "nome": alunoEncontrado.user.nome, "user_id": alunoEncontrado.user._id, "email": alunoEncontrado.user.email, "senha": alunoEncontrado.user.senha, "matricula": alunoEncontrado.matricula, "curso": alunoEncontrado.curso, "semestre": alunoEncontrado.semestre})
                 } 
                 else {
                     res.status(200).json(false)

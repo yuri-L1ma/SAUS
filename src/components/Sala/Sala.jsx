@@ -1,8 +1,6 @@
 import "./Sala.css"
 import { useState, useEffect } from "react";
-import projetor_icon from "../../assets/icons/projetor.svg"
-import ar_icon from "../../assets/icons/ar.svg"
-import { Edit2Icon, PlusCircle, Trash } from "lucide-react";
+import { Edit2Icon, PlusCircle, Trash, TrashIcon } from "lucide-react";
 import { useContext } from "react"
 import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
 import { ModalBody, ModalHeader, ModalSection } from "../Modal/Modal";
@@ -11,6 +9,7 @@ import 'moment/locale/pt'
 import axios from "axios";
 import React from "react";
 import ReactDOM from "react-dom";
+import { Link } from "react-router-dom";
 
 moment.locale('pt')
 
@@ -40,7 +39,7 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
     }, [daysSelected])
 
     useEffect(() => {
-        if(daysSelected.length > 0) {
+        if (daysSelected.length > 0) {
             setDaysSelected([])
             for (let day of daysSelected) {
                 let diaAdicionado = { dia: day.dia, turnos: turnosSelected }
@@ -199,18 +198,18 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
     const handleCreateReserva = (event) => {
         event.preventDefault()
 
-        
+
         const init_date = document.querySelector("#init_date").value
         const end_date = document.querySelector("#end_date")
         const activity = document.querySelector("#activity").value
         const quantity_people = document.querySelector("#quantity_people").value
         const justification = document.querySelector("#justification").value
         const sala_id = sala._id
-        
+
 
         // alert(`${turno} ${init_date} ${activity} ${quantity_people} ${justification}`)
 
-        if(end_date){
+        if (end_date) {
             const user_id = document.querySelector("#full_name").getAttribute("data-aluno-id")
             axios.post("http://localhost:3002/dias/criar", { dias: daysSelected }).then((dias) => {
                 let idDias = dias.data.map((dia) => dia._id)
@@ -222,10 +221,10 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
                     console.log(error.response.data)
                 })
             }).catch((error) => { alert(error) })
-        }else{
+        } else {
             const turno = document.querySelector("#alunoturno").getAttribute("data-id-turno")
             const user_id = user.id
-            axios.post("http://localhost:3002/dias/criar", { dias: {dia: init_date, turnos: [turno]} }).then((dias) => {
+            axios.post("http://localhost:3002/dias/criar", { dias: { dia: init_date, turnos: [turno] } }).then((dias) => {
                 let idDias = dias.data.map((dia) => dia._id)
                 axios.post("http://localhost:3002/reservas/criar", { atividade: activity, justificativa: justification, solicitante: user_id, sala: sala_id, qtdAlunos: quantity_people, ativa: true, dias: idDias }).then((response) => {
                     closeModalReserva()
@@ -285,23 +284,38 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
 
     const getAlunoByMatricula = (event) => {
         event.preventDefault()
-        if(event.target.value.length > 0){
+        if (event.target.value.length > 0) {
             axios.get(`http://localhost:3002/alunos/retrievematricula/${event.target.value}`).then((response) => {
                 const aluno = response.data[0]
-                if(aluno){
+                if (aluno) {
                     document.querySelector("#full_name").value = aluno.nome
                     document.querySelector("#full_name").setAttribute("data-aluno-id", aluno.id)
-                }else{
+                } else {
                     document.querySelector("#full_name").value = "Aluno não encontrado"
                     document.querySelector("#full_name").setAttribute("data-aluno-id", "")
                 }
             })
         }
-        if(event.target.value.length === 0){
+        if (event.target.value.length === 0) {
             document.querySelector("#full_name").value = ""
             document.querySelector("#full_name").setAttribute("data-aluno-id", "")
         }
     }
+
+    const handleDesativarReserva = (event) => {
+        event.preventDefault()
+
+        let dias = sala.reserva.dias.map((dia) => dia._id)
+
+        axios.put(`http://localhost:3002/reservas/atualizar/${sala.reserva._id}`, { ...sala.reserva, solicitante: sala.reserva.solicitante._id, dias, ativa: false }).then((response) => {
+            alert("Reserva cancelada com sucesso!")
+            updateSalas()
+            closeModalReserva()
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+
 
     const configureFormsReserva = () => {
         if (sala.disponivel) {
@@ -338,7 +352,7 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
                                         <label for="turno">Turno(s)</label>
                                     </div>
                                     <div className="content-turnos d-flex flex-wrap flex-md-nowrap gap-3">
-                                        {turnosSelected.map((turno) => <TurnoElement turno={turno} />)}
+                                        {turnosSelected.map((turno) => <TurnoElement turno={turno} edit={true} />)}
                                         <div className="dropdown">
                                             <button className="adicionar outlined text-nowrap d-flex align-items-center gap-3 w-100" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <PlusCircle size={22} />
@@ -420,57 +434,53 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
         } else {
             if (admin) {
                 return (
-                    <form action="">
-                        <div className="d-flex flex-column flex-md-row w-100 gap-3">
-                            <div className="input_group">
-                                <label for="full_name">Nome completo</label>
-                                <input className="textfield" placeholder="Nome completo" value={sala.reserva.solicitante.user.nome} readOnly type="text" name="full_name" id="full_name" />
+                    <form action="" className="d-flex flex-column gap-3 w-100">
+                        <div className="d-flex flex-column gap-3">
+                            <div className="d-flex gap-3">
+                                <div className="input_group">
+                                    <label>Solicitante</label>
+                                    <input className="textfield" type="text" readOnly value={sala.reserva.solicitante.user.nome}></input>
+                                </div>
+                                <div className="input_group">
+                                    <label>Matricula</label>
+                                    <input className="textfield" type="text" readOnly value={sala.reserva.solicitante.matricula}></input>
+                                </div>
                             </div>
+                            <div className="d-flex gap-3">
+                                <div className="input_group">
+                                    <label for="Remember">Atividade</label>
+                                    <input className="textfield" name="" readOnly value={sala.reserva.atividade}></input>
+                                </div>
+                                <div className="input_group">
+                                    <label>Local</label>
+                                    <input className="textfield" type="text" readOnly value={`${sala.reserva.sala.nome}, Bloco ${sala.reserva.sala.bloco.numero}`}></input>
+                                </div>
+                                <div className="input_group">
+                                    <label for="Remember" className="text-nowrap">Nº de pessoas</label>
+                                    <input className="textfield" type="text" readOnly value={sala.reserva.qtdAlunos}></input>
+                                </div>
+                            </div>
+
+                            <div className="input_group justificativa">
+                                <label for="Remember">Justificativa</label>
+                                <textarea name="" readOnly value={sala.reserva.justificativa}></textarea>
+                            </div>
+
                             <div className="input_group">
-                                <label for="registration">Matrícula</label>
-                                <input className="textfield" placeholder="Matrícula" value={sala.reserva.solicitante.matricula} readOnly type="text" name="registration" id="registration" />
+                                <label for="Remember">Dias</label>
+                                <div className="d-flex gap-3 mh-50">
+                                    {sala.reserva.dias.map((dia) => {
+                                        return <DayElement day={dia} />
+                                    })}
+                                </div>
                             </div>
                         </div>
-                        <div className="d-flex w-100 gap-3">
-                            <div className="input_group">
-                                <label for="period">Período</label>
-                                <select name="period" disabled="true" id="period">
-                                    <option value="AB1" selected>AB | MANHÃ</option>
-                                    <option value="CD1">CD | MANHÃ</option>
-                                    <option value="AB2">AB | TARDE</option>
-                                    <option value="CD2">CD | TARDE</option>
-                                </select>
-                            </div>
-                            <div className="input_group">
-                                <label for="init_date">Data inicial</label>
-                                <input className="textfield" type="date" name="init_date" value={moment().format("YYYY-MM-DD")} readOnly id="init_date" />
-                            </div>
-                            <div className="input_group">
-                                <label for="end_date">Data final</label>
-                                <input className="textfield" type="date" name="end_date" value={"2023-06-13"} readOnly id="end_date" />
-                            </div>
+                        <div className="d-flex w-100 justify-content-between justify-content-md-end">
+                            <button onClick={handleDesativarReserva} className="d-flex gap-2 justify-content-around align-self-end w-auto red">
+                                <TrashIcon size={24} />
+                                <span>Cancelar reserva</span>
+                            </button>
                         </div>
-                        <div className="d-flex justify-content-between w-100">
-                            <div className="input_group">
-                                <label for="activity">Atividade</label>
-                                <input type="text" className="textfield" value={sala.reserva.atividade} />
-                                {/* <select name="activity" id="activity" disabled="true">
-                                    <option value="Estudar com amigos">Estudar com amigos</option>
-                                    <option value="Descansar" selected>Descansar depois de um dia chato</option>
-                                    <option value="Sei lá mano">Sei lá mano</option>
-                                    <option value="Fofocar">Fofocar</option>
-                                </select> */}
-                            </div>
-                            <div className="input_group align-items-end">
-                                <label for="people">Nº de pessoas</label>
-                                <input className="textfield w-50" placeholder="Nº" type="number" name="people" id="people" value={2} readOnly />
-                            </div>
-                        </div>
-                        <div className="input_group">
-                            <label for="justification">Justificativa</label>
-                            <textarea name="justification" id="justification" value={sala.reserva.justificativa} cols="30" rows="10" readOnly></textarea>
-                        </div>
-                        <button className="red w-auto">Desabilitar reserva</button>
                     </form>
                 )
             }
@@ -634,14 +644,17 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
         })
     }
 
-    const TurnoElement = ({ turno }) => {
+    const TurnoElement = ({ turno, edit }) => {
         return (
             <>
                 <div class="turno-element d-flex align-items-center justify-content-between ps-3 gap-2 flex-grow-1" data-turno-id={turno._id}>
                     <span className="text-nowrap">{turno.nome}</span>
-                    <button type="button" class="rounded-button" data-turno-id="${turno._id}" onClick={() => removeContentTurno(turno._id)}>
-                        <Trash size={18} />
-                    </button>
+                    {edit ?
+                        <button type="button" class="rounded-button" data-turno-id="${turno._id}" onClick={() => removeContentTurno(turno._id)}>
+                            <Trash size={18} />
+                        </button> :
+                        null
+                    }
                 </div>
             </>
         )
@@ -649,10 +662,10 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
 
     const DayElement = ({ day }) => {
         return (
-            <div className="d-flex flex-grow-1 gap-3 flex-column p-3 border border-secondary rounded">
+            <div className="d-flex flex-grow-1 gap-3 flex-column p-3 bordinha rounded">
                 <span>{moment(day.dia).format("dddd, DD [de] MMMM")}</span>
                 <div className="d-flex gap-3 flex-wrap">
-                    {turnosSelected.map((turno) => <TurnoElement turno={turno} />)}
+                    {day.turnos.map((turno) => <TurnoElement turno={turno} edit={false} />)}
                 </div>
             </div>
         )
@@ -677,8 +690,12 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
                                 <button className="green" onClick={openModalReserva}>Fazer Reserva</button>
                                 : admin ?
                                     <button className="red" onClick={openModalReserva}>Ver reserva</button>
-                                    :
-                                    <button className="red" onClick={openModalQueixa}>Fazer Queixa</button>
+                                    : sala.reserva.solicitante._id === user.id ?
+                                        <Link to="/aluno/reservas" className="d-none d-md-flex">
+                                            <button className="outlined w-100">Acessar minhas reservas</button>
+                                        </Link>
+                                        :
+                                        <button className="red" onClick={openModalQueixa}>Fazer Queixa</button>
                             }
                         </>
                         :
@@ -715,8 +732,12 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
                             <button className="green d-md-none" onClick={openModalReserva}>Fazer Reserva</button>
                             : admin ?
                                 <button className="red d-md-none" onClick={openModalReserva}>Ver reserva</button>
-                                :
-                                <button className="red d-md-none" onClick={openModalQueixa}>Fazer Queixa</button>
+                                : sala.reserva.solicitante._id === user.id ?
+                                    <Link to="/aluno/reservas">
+                                        <button className="outlined w-100">Acessar minhas reservas</button>
+                                    </Link>
+                                    :
+                                    <button className="red d-md-none" onClick={openModalQueixa}>Fazer Queixa</button>
                         }
                     </div>
                 </aside>

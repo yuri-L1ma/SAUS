@@ -65,7 +65,7 @@ const Alunos = () => {
                     <div className="d-flex flex-column flex-wrap flex-md-row gap-4">
                         {
                             alunosFiltrados.map((aluno) => (
-                                <Aluno nome={aluno.nome} matricula={aluno.matricula} />
+                                <Aluno aluno={aluno} />
                             ))
                         }
                     </div>

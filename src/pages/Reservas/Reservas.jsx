@@ -1,3 +1,4 @@
+import "./Reservas.css"
 import seta_azul from "../../assets/icons/setaAzul.svg"
 import Menu from "../../components/Menu/Menu"
 import { NavLink } from "react-router-dom"
@@ -11,6 +12,7 @@ import axios from "axios"
 const Reservas = () => {
     const [reservas, setReservas] = useState([])
     const { user } = useContext(ContextoGambiarra)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         initComponents()
@@ -23,7 +25,11 @@ const Reservas = () => {
     const initComponents = async () => {
         try {
             let reservas = await axios.get(`http://localhost:3002/reservas/aluno/${user.id}`)
-            setReservas(reservas.data)
+        
+            let reservasOrdenadas = reservas.data.sort((a, b) => (b.ativa - a.ativa))
+            
+            setReservas(reservasOrdenadas)
+            setLoading(false)
         } catch (error) {
             console.log(error)
         }
@@ -44,11 +50,12 @@ const Reservas = () => {
                 </NavLink>
                 <section className="reservas mt-2">
                     <div className="d-flex flex-column gap-4">
+                        {loading && <div className="load"><div className="circle"></div></div>}
                         {reservas.length > 0 ?
                             reservas.map((reserva) => {
-                                return <Reserva reserva={reserva} />
-                            }) :
-                            <div className="d-flex flex-column gap-4 flex-md-row ">
+                                return <Reserva reserva={reserva} updateReservas={initComponents} />
+                            }) : loading ? null :
+                            <div className="d-flex flex-column gap-4 flex-md-row notem">
                                 <h1 className="w-100 d-flex justify-content-center align-items-center" style={{fontSize:"10rem", color: "#2376D7"}}>:(</h1>
                                 <div className="w-100 d-flex gap-3 flex-column justify-content-center">
                                     <h1 style={{color: "#2376D7"}}>Você não tem reservas feitas no sistema!</h1>
