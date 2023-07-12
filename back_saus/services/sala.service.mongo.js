@@ -151,7 +151,7 @@ class SalaService {
 
     static async getReservaFuncionante(sala, data) {
         try {
-            let reservas = await ReservaModel.find({ _id: { $in: sala.reservas } }).populate({ path: 'dias', populate: 'turnos' })
+            let reservas = await ReservaModel.find({ _id: { $in: sala.reservas } }).populate({ path: 'solicitante' }).populate({ path: 'dias', populate: 'turnos' })
 
             reservas = reservas.filter(reserva => reserva.ativa === true)
 

@@ -1,5 +1,5 @@
 
-div.login{
+div.cadastrar{
     display: flex;
     flex-direction: column;
     justify-content: center !important;
@@ -8,15 +8,20 @@ div.login{
     height: 100vh !important;
     margin: auto;
 }
-div.login a:hover{
+
+/* div.cadastrar form{
+    height: 80vh;
+    overflow: auto;
+} */
+
+div.cadastrar a:hover{
     background: none !important;
 }
 
 @media screen and (max-width: 768px){
-    div.login{
-        width: 100%;
-        /* margin: auto; */
-        margin: 50px auto;
+    div.cadastrar{
+        width: 80%;
+        margin: auto;
     }
 }
     

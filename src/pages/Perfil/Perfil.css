@@ -1,0 +1,14 @@
+.link-editar {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    /* Adicione outros estilos desejados para o texto do link */
+  }
+  
+  .link-editar:hover {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    background-color: transparent;
+    /* Adicione outros estilos desejados para o texto do link */
+  }

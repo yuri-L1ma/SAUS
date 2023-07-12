@@ -4,19 +4,33 @@ import Aluno from "../../components/Aluno/Aluno"
 import "./Alunos.css"
 import { NavLink } from "react-router-dom"
 import seta_azul from "../../assets/icons/setaAzul.svg"
+import { useEffect, useState } from "react"
+import axios from "axios"
 
 const Alunos = () => {
+    const [alunos, setAlunos] = useState([])
+    const [pesquisarTermo, setPesquisarTermo] = useState('')
 
+    useEffect(() => {
+        axios.get("http://localhost:3002/alunos/listar")
+            .then((response) => {
+                setAlunos(response.data)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }, [])
 
-    const alunos = [
-        { nome: "Mario José", matricula: "339383", },
-        { nome: "Hercules Lima", matricula: "609868", },
-        { nome: "Milena Farias", matricula: "5096043", },
-        { nome: "Herbeth Richers", matricula: "069893", },
-        { nome: "Oliveira Limão", matricula: "989589", },
-        { nome: "Manoel Seboso", matricula: "123499", },
-        { nome: "Maionesen Temperada", matricula: "233231", }
-    ]
+    const handlePesquisar = (event) => {
+        const pesquisarValor = event.target.value.toLowerCase()
+        setPesquisarTermo(pesquisarValor)
+    }
+
+    const alunosFiltrados = alunos.filter((aluno) => {
+        const nome = aluno.nome.toLowerCase()
+        const matricula = aluno.matricula.toString()
+        return nome.startsWith(pesquisarTermo) || matricula.startsWith(pesquisarTermo)
+    })
 
     return (
         <>
@@ -34,7 +48,15 @@ const Alunos = () => {
                     <h5 className="d-md-block d-none">Alunos</h5>
                     <form action="#">
                         <div className="search_input d-flex align-items-center gap-3">
-                            <input type="text" className="textfield" name="" id="" placeholder="Pesquisar" />
+                            <input
+                                type="text"
+                                className="textfield"
+                                name=""
+                                id=""
+                                placeholder="Pesquisar"
+                                value={pesquisarTermo}
+                                onChange={handlePesquisar}
+                            />
                             <SearchIcon size={28} stroke="#2376D7" />
                         </div>
                     </form>
@@ -42,9 +64,9 @@ const Alunos = () => {
                 <section className="alunos mt-4">
                     <div className="d-flex flex-column flex-wrap flex-md-row gap-4">
                         {
-                            alunos.map((aluno) => {
-                                return <Aluno nome={aluno.nome} matricula={aluno.matricula} />
-                            })
+                            alunosFiltrados.map((aluno) => (
+                                <Aluno nome={aluno.nome} matricula={aluno.matricula} />
+                            ))
                         }
                     </div>
                 </section>

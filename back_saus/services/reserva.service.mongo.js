@@ -57,6 +57,16 @@ class ReservaService {
             )
             .catch(err => res.status(500).json(err))
     }
+
+    static reservasPorAluno(req, res) {
+        ReservaModel.find({solicitante: req.params.id}).populate({path: 'dias', populate: {path: 'turnos'} }).populate({path: 'sala', populate: {path: 'bloco'} })
+            .then(
+                (reservas) => {
+                    res.status(200).json(reservas)
+                }
+            )
+            .catch(err => res.status(500).json(err))
+    }
 }
 
 module.exports = ReservaService;

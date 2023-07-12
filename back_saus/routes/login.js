@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
+var loginService = require("../services/aluno.login.service.mongo")
+
 // VERSÃO GAMBIARRA
 // var loginService = require("../services/login.service")
 
@@ -19,5 +21,13 @@ var router = express.Router();
 // )
 
 //VERSÃO COM MONGOOSE --- Colocar abaixo daqui
+
+router.post(
+    "/login",
+    (req, res, next) => {
+        console.log(req.body)
+        loginService.Logar(req.body, res)
+    }
+)
 
 module.exports = router;

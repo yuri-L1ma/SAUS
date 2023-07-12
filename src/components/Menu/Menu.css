@@ -28,6 +28,10 @@
     transition: background-color .2s ease-in-out;
 }
 
+.menu .nome {
+    color: white;
+}
+
 .menu-colapse {
     width: 100%;
     height: 100%;

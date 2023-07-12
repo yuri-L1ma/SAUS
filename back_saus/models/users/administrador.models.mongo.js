@@ -1,5 +1,5 @@
 var mongoose = require("mongoose")
-var UsuarioModel = require("./usuario.models")
+var UsuarioModel = require("./usuario.models.mongo")
 
 var AdministradorSchema = new mongoose.Schema(
     {

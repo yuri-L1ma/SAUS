@@ -3,12 +3,14 @@ import logo from "../../assets/imgs/simplified_logo.png"
 import bars_icon from "../../assets/icons/bars.svg"
 
 import { NavLink, Link } from "react-router-dom"
-import { Building2, Home, Megaphone, Ticket, Users2, UserCircle, ArrowLeftRight, LogOut } from "lucide-react"
+import { Building2, Home, Megaphone, Ticket, Users2, UserCircle, LogOut } from "lucide-react"
 import { useContext } from "react"
-import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
+import { ContextoGambiarra } from '../../utils/ContextoGambiarra'
+
 
 const Menu = () => {
-    const { admin, updateAdmin } = useContext(ContextoGambiarra)
+    const { admin, user, logout } = useContext(ContextoGambiarra)
+
 
     const toogleMenu = () => {
         const menu = document.querySelector(".menu-colapse")
@@ -18,10 +20,15 @@ const Menu = () => {
     const closeMenu = () => {
         const menu = document.querySelector(".menu-colapse")
         menu.classList.remove("ativo")
+        // logout()
     }
 
-    const tooglePoder = () => {
-        updateAdmin()
+    // const tooglePoder = () => {
+    //     updateAdmin()
+    // }
+
+    const handleLogout = () => {
+        logout()
     }
 
     return (
@@ -34,11 +41,12 @@ const Menu = () => {
                         </Link>
                     </div>
                     <div className="gambiarra">
-                        <button className="d-flex align-items-center gap-3 w-100 h-100 gambiarra" onClick={tooglePoder}>
+                        <span className="nome">Olá, {user.nome}!</span>
+                        {/* <button className="d-flex align-items-center gap-3 w-100 h-100 gambiarra" onClick={tooglePoder}>
                             <span>{admin ? "Admin" : "Aluno"}</span>
                             <ArrowLeftRight size={24} />
                             <span>{!admin ? "Admin" : "Aluno"}</span>
-                        </button>
+                        </button> */}
                     </div>
                     <button onClick={toogleMenu} type="button">
                         <img src={bars_icon} alt="" />
@@ -107,9 +115,9 @@ const Menu = () => {
                                 </li>
                             </>
                         }
-                        <li className="nav-item">
+                        <li className="nav-item" onClick={handleLogout}>
                             <NavLink to={"/login"} className={"nav-link bg-danger text-light"}>
-                                <div className="d-flex gap-3">
+                                <div className="d-flex gap-3" >
                                     <LogOut size={24} />
                                     <span>Sair</span>
                                 </div>
@@ -189,7 +197,7 @@ const Menu = () => {
 
                             </div>
                             <div>
-                                <li className="nav-item">
+                                <li className="nav-item" onClick={handleLogout}>
                                     <NavLink onClick={closeMenu} to={"/login"} className={"nav-link bg-danger text-light"}>
                                         <div className="d-flex gap-3">
                                             <LogOut size={24} />

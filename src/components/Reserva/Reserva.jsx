@@ -2,8 +2,9 @@ import { useContext, useRef } from "react"
 import "./Reserva.css"
 import { XIcon, TrashIcon } from "lucide-react"
 import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
+import moment from "moment"
 
-const Reserva = ({ ativa }) => {
+const Reserva = ({ reserva }) => {
     const reservaRef = useRef(null)
     const { admin } = useContext(ContextoGambiarra)
 
@@ -12,52 +13,62 @@ const Reserva = ({ ativa }) => {
         reservaRef.current.classList.toggle("ativo")
     }
 
+    const DayElement = ({ day }) => {
+        return (
+            <div className="d-flex flex-grow-1 gap-3 flex-column p-3 bordinha rounded">
+                <span className="text-dark text-nowrap font-weight-light">{moment(day.dia).format("dddd, DD [de] MMMM")}</span>
+                <div className="d-flex gap-3">
+                    {day.turnos.map((turno) => <TurnoElement turno={turno} />)}
+                </div>
+            </div>
+        )
+    }
+
+    const TurnoElement = ({ turno }) => {
+        return (
+            <>
+                <div class="turno-element d-flex justify-content-center align-items-center p-2 flex-grow-1" data-turno-id={turno._id}>
+                    <span className="text-nowrap text-dark ">{turno.nome}</span>
+                </div>
+            </>
+        )
+    }
+
     return (
         <div className="reserva" ref={reservaRef}>
             <header onClick={toggleActiveReserve}>
-                <h1>Sala 1, bloco 1</h1>
-                <h1 className={ativa ? "ativa" : "inativa"}>{ativa ? "Ativa" : "Inativa"}</h1>
+                <h1>{reserva.atividade}</h1>
+                <h1 className={reserva.ativa ? "ativa" : "inativa"}>{reserva.ativa ? "Ativa" : "Inativa"}</h1>
             </header>
             <aside>
                 <section>
                     <form action="" className="d-flex flex-column gap-3 w-100">
                         <div className="d-flex flex-column gap-3 gap-md-5 flex-md-row">
-                            <div className="d-flex gap-md-3 flex-column w-100 justify-content-between">
-                                <div className="d-flex flex-column flex-md-row justify-content-between w-100 gap-3">
+                            <div className="d-flex flex-column gap-3 ">
+                                <div className="d-flex gap-3 flex-column">
                                     <div className="input_group">
-                                        <label for="Remember">Nome completo</label>
-                                        <input className="textfield" value={"YURI SILVA DE LIMA"} readOnly placeholder="Nome Completo" type="email" name="" id="" />
+                                        <label>Local</label>
+                                        <div className="d-flex align-items-center ">
+                                            <h3 className="text-nowrap">{reserva.sala.nome}, Bloco {reserva.sala.bloco.numero}</h3>
+                                        </div>
                                     </div>
-                                    <div className="input_group align-items-md-end">
-                                        <label for="Remember">Matrícula</label>
-                                        <input className="textfield" placeholder="" value={"512414"} readOnly type="number" name="" id="" />
-                                    </div>
-                                </div>
-                                <div className="d-flex flex-column gap-3 flex-md-row w-100">
                                     <div className="input_group">
-                                        <label for="Remember">Período</label>
-                                        <input className="textfield info-destaque" placeholder="" value={"AB - MANHÃ"} readOnly type="text" name="" id="" />
-                                    </div>
-                                    <div className="d-flex gap-3 flex-row justify-content-between">
-                                        <div className="input_group">
-                                            <label for="Remember">Atividade</label>
-                                            <select name="" id="">
-                                                <option value="">Hoje</option>
-                                                <option value="">Amanha</option>
-                                                <option value="">26/12</option>
-                                                <option value="">26/12</option>
-                                            </select>
-                                        </div>
-                                        <div className="input_group align-items-end">
-                                            <label for="Remember" className="text-nowrap">Nº de pessoas</label>
-                                            <input className="textfield" placeholder="Nº" type="number" name="" id="" />
-                                        </div>
+                                        <label for="Remember" className="text-nowrap">Nº de pessoas</label>
+                                        <h3 className="text-nowrap">{reserva.qtdAlunos} pessoas</h3>
                                     </div>
                                 </div>
                             </div>
-                            <div className="input_group justificativa flex-shrink-1 w-auto">
+                            <div className="input_group justificativa">
                                 <label for="Remember">Justificativa</label>
-                                <textarea name="" readOnly value={"Estudar é bom e é porque é"} id="" cols="10" rows="5"></textarea>
+                                <textarea name="" readOnly value={reserva.justificativa}></textarea>
+                            </div>
+                            <div className="input_group">
+                                <label for="Remember">Dias</label>
+                                <div className="d-flex gap-3 mh-50">
+                                    {reserva.dias.map((dia) => {
+                                        return <DayElement day={dia} />
+                                    })}
+                                </div>
                             </div>
                         </div>
                         <div className="d-flex w-100 justify-content-between justify-content-md-end">

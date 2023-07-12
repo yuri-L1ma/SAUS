@@ -2,9 +2,33 @@ import seta_azul from "../../assets/icons/setaAzul.svg"
 import Menu from "../../components/Menu/Menu"
 import { NavLink } from "react-router-dom"
 import Reserva from "../../components/Reserva/Reserva"
+import { useEffect } from "react"
+import { useState } from "react"
+import { useContext } from "react"
+import { ContextoGambiarra } from "../../utils/ContextoGambiarra"
+import axios from "axios"
 
 const Reservas = () => {
-    const reservas = [{sala:{}, aluno:{}, justificativa:"", ativa: true }, { ativa: false }, { ativa: false }, { ativa: true }]
+    const [reservas, setReservas] = useState([])
+    const { user } = useContext(ContextoGambiarra)
+
+    useEffect(() => {
+        initComponents()
+    }, [])
+
+    useEffect(() => {
+        initComponents()
+    }, [user])
+
+    const initComponents = async () => {
+        try {
+            let reservas = await axios.get(`http://localhost:3002/reservas/aluno/${user.id}`)
+            setReservas(reservas.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <>
             <Menu />
@@ -20,10 +44,17 @@ const Reservas = () => {
                 </NavLink>
                 <section className="reservas mt-2">
                     <div className="d-flex flex-column gap-4">
-                        {
+                        {reservas.length > 0 ?
                             reservas.map((reserva) => {
-                                return <Reserva ativa={reserva.ativa} />
-                            })
+                                return <Reserva reserva={reserva} />
+                            }) :
+                            <div className="d-flex flex-column gap-4 flex-md-row ">
+                                <h1 className="w-100 d-flex justify-content-center align-items-center" style={{fontSize:"10rem", color: "#2376D7"}}>:(</h1>
+                                <div className="w-100 d-flex gap-3 flex-column justify-content-center">
+                                    <h1 style={{color: "#2376D7"}}>Você não tem reservas feitas no sistema!</h1>
+                                    <p>Vá na aba home, procure uma sala disponível e faça sua reserva</p>
+                                </div>
+                            </div>
                         }
                     </div>
                 </section>

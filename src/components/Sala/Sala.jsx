@@ -26,7 +26,7 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
     const [daysSelected, setDaysSelected] = useState([])
     const [materiais, setMateriais] = useState(sala.materiais)
 
-    const { admin } = useContext(ContextoGambiarra)
+    const { admin, user } = useContext(ContextoGambiarra)
 
     useEffect(() => {
         initComponents()
@@ -206,13 +206,15 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
         const quantity_people = document.querySelector("#quantity_people").value
         const justification = document.querySelector("#justification").value
         const sala_id = sala._id
+        
 
         // alert(`${turno} ${init_date} ${activity} ${quantity_people} ${justification}`)
 
         if(end_date){
+            const user_id = document.querySelector("#full_name").getAttribute("data-aluno-id")
             axios.post("http://localhost:3002/dias/criar", { dias: daysSelected }).then((dias) => {
                 let idDias = dias.data.map((dia) => dia._id)
-                axios.post("http://localhost:3002/reservas/criar", { atividade: activity, justificativa: justification, sala: sala_id, qtdAlunos: quantity_people, ativa: true, dias: idDias }).then((response) => {
+                axios.post("http://localhost:3002/reservas/criar", { atividade: activity, justificativa: justification, sala: sala_id, solicitante: user_id, qtdAlunos: quantity_people, ativa: true, dias: idDias }).then((response) => {
                     closeModalReserva()
                     updateSalas()
                     // initComponents()
@@ -222,9 +224,10 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
             }).catch((error) => { alert(error) })
         }else{
             const turno = document.querySelector("#alunoturno").getAttribute("data-id-turno")
+            const user_id = user.id
             axios.post("http://localhost:3002/dias/criar", { dias: {dia: init_date, turnos: [turno]} }).then((dias) => {
                 let idDias = dias.data.map((dia) => dia._id)
-                axios.post("http://localhost:3002/reservas/criar", { atividade: activity, justificativa: justification, sala: sala_id, qtdAlunos: quantity_people, ativa: true, dias: idDias }).then((response) => {
+                axios.post("http://localhost:3002/reservas/criar", { atividade: activity, justificativa: justification, solicitante: user_id, sala: sala_id, qtdAlunos: quantity_people, ativa: true, dias: idDias }).then((response) => {
                     closeModalReserva()
                     updateSalas()
                     // initComponents()
@@ -280,21 +283,41 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
         }
     }
 
+    const getAlunoByMatricula = (event) => {
+        event.preventDefault()
+        if(event.target.value.length > 0){
+            axios.get(`http://localhost:3002/alunos/retrievematricula/${event.target.value}`).then((response) => {
+                const aluno = response.data[0]
+                if(aluno){
+                    document.querySelector("#full_name").value = aluno.nome
+                    document.querySelector("#full_name").setAttribute("data-aluno-id", aluno.id)
+                }else{
+                    document.querySelector("#full_name").value = "Aluno não encontrado"
+                    document.querySelector("#full_name").setAttribute("data-aluno-id", "")
+                }
+            })
+        }
+        if(event.target.value.length === 0){
+            document.querySelector("#full_name").value = ""
+            document.querySelector("#full_name").setAttribute("data-aluno-id", "")
+        }
+    }
+
     const configureFormsReserva = () => {
         if (sala.disponivel) {
             if (admin) {
                 return (
                     <form onSubmit={handleCreateReserva}>
-                        {/* <div className="d-flex flex-column flex-md-row w-100 gap-3">
-                            <div className="input_group">
-                                <label for="full_name">Nome completo</label>
-                                <input className="textfield" placeholder="Nome completo" type="text" name="full_name" id="full_name" />
-                            </div>
+                        <div className="d-flex flex-column flex-md-row w-100 gap-3">
                             <div className="input_group">
                                 <label for="registration">Matrícula</label>
-                                <input className="textfield" placeholder="Matrícula" type="text" name="registration" id="registration" />
+                                <input className="textfield" placeholder="Matrícula" type="text" maxLength={6} name="registration" id="registration" onChange={getAlunoByMatricula} />
                             </div>
-                        </div> */}
+                            <div className="input_group">
+                                <label for="full_name">Nome completo</label>
+                                <input className="textfield" placeholder="Nome completo" type="text" name="full_name" id="full_name" data-aluno-id="" readOnly />
+                            </div>
+                        </div>
                         <div className="d-flex flex-column w-100 gap-3" onChange={handlePeriod}>
                             <div className="d-flex flex-column flex-md-row gap-3">
                                 <div className="input_group">
@@ -366,16 +389,6 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
             } else {
                 return (
                     <form onSubmit={handleCreateReserva}>
-                        {/* <div className="d-flex flex-column flex-md-row w-100 gap-3">
-                            <div className="input_group">
-                                <label for="full_name">Nome completo</label>
-                                <input className="textfield" placeholder="Nome completo" type="text" name="full_name" id="full_name" />
-                            </div>
-                            <div className="input_group">
-                                <label for="registration">Matrícula</label>
-                                <input className="textfield" placeholder="Matrícula" type="text" name="registration" id="registration" />
-                            </div>
-                        </div> */}
                         <div className="d-flex flex-column flex-md-row w-100 gap-3">
                             <div className="input_group">
                                 <label for="turno">Turno</label>
@@ -411,11 +424,11 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
                         <div className="d-flex flex-column flex-md-row w-100 gap-3">
                             <div className="input_group">
                                 <label for="full_name">Nome completo</label>
-                                <input className="textfield" placeholder="Nome completo" value={"Yuri Silva de Lima"} readOnly type="text" name="full_name" id="full_name" />
+                                <input className="textfield" placeholder="Nome completo" value={sala.reserva.solicitante.user.nome} readOnly type="text" name="full_name" id="full_name" />
                             </div>
                             <div className="input_group">
                                 <label for="registration">Matrícula</label>
-                                <input className="textfield" placeholder="Matrícula" value={"512314"} readOnly type="text" name="registration" id="registration" />
+                                <input className="textfield" placeholder="Matrícula" value={sala.reserva.solicitante.matricula} readOnly type="text" name="registration" id="registration" />
                             </div>
                         </div>
                         <div className="d-flex w-100 gap-3">
@@ -521,6 +534,7 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
         axios.delete(`http://localhost:3002/salas/remover/${sala._id}`).then((response) => {
             alert("Sala removida com sucesso")
             closeModalEditSala()
+            updateSalas()
         }).catch((error) => {
             console.log(error)
         })
@@ -655,14 +669,6 @@ const Sala = ({ sala, date, reservavel, updateSalas }) => {
                                 <Edit2Icon size={16} />
                             </button>
                             : null}
-                    </div>
-                    <div className="icons">
-                        <span>
-                            <img src={projetor_icon} alt="" />
-                        </span>
-                        <span>
-                            <img src={ar_icon} alt="" />
-                        </span>
                     </div>
                     {reservavel ?
                         <>

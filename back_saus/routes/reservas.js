@@ -6,6 +6,10 @@ router.get('/listar', (req, res, next) => {
     reservaServiceMongo.listar(req, res)
 })
 
+router.get('/aluno/:id', (req, res, next) => {
+    reservaServiceMongo.reservasPorAluno(req, res)
+})
+
 router.get('/retrieve/:id', (req, res, next) => {
     reservaServiceMongo.retrieve(req, res)
 })

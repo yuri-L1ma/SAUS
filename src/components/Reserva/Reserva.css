@@ -48,9 +48,7 @@
     transition: max-height 0.5s ease;
 }
 
-.reserva aside span {
-    font-weight: bolder;
-}
+
 
 .reserva aside section {
     display: flex;
@@ -67,8 +65,8 @@
 }
 
 
-@media screen and (min-width: 768px) {
+/* @media screen and (min-width: 768px) {
     .reserva .justificativa {
         width: 60% !important;
     }
-}
+} */
